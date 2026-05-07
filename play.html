@@ -18,7 +18,7 @@
     .back-btn { font-size: 30px; color: white; text-decoration: none; }
     .status { 
       position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-      z-index: 100; text-align:center; background:rgba(0,0,0,0.7); padding:20px; border-radius:12px;
+      z-index: 100; text-align:center; background:rgba(0,0,0,0.8); padding:25px; border-radius:12px;
     }
   </style>
 </head>
@@ -30,7 +30,7 @@
     <div><strong id="chName">Loading Channel...</strong><br><small id="chInfo">Tata Play</small></div>
   </div>
 
-  <div class="status" id="status">Fetching stream config...</div>
+  <div class="status" id="status">Connecting...</div>
 
   <div data-shaka-player-container style="width:100%; height:100%;">
     <video id="video" autoplay muted playsinline></video>
@@ -47,33 +47,35 @@ async function fetchStreamConfig() {
     const res = await fetch(CORS_PROXY + encodeURIComponent(target));
     const html = await res.text();
 
-    // Extract the entire streamConfig object
-    const match = html.match(/const streamConfig\s*=\s*(\{[\s\S]*?\n\s*\};)/);
-    if (!match) throw new Error("Could not find streamConfig");
+    // Extract raw streamConfig text
+    let configText = html.match(/const streamConfig\s*=\s*(\{[\s\S]*?\};)/)[1];
 
-    let raw = match[1];
+    // Manual parsing (more reliable)
+    const name = configText.match(/name:\s*["']([^"']+)["']/)[1];
+    const mpd = configText.match(/mpd:\s*["']([^"']+)["']/)[1];
+    const token = configText.match(/token:\s*["']([^"']+)["']/)[1];
+    const referer = configText.match(/referer:\s*["']([^"']+)["']/)[1];
+    const userAgent = configText.match(/userAgent:\s*["']([^"']+)["']/)[1];
 
-    // Very robust cleaning
-    raw = raw
-      .replace(/(\b\w+\b):/g, '"$1":')     // unquoted keys
-      .replace(/'/g, '"')                  // single to double quotes
-      .replace(/,\s*}/g, '}')              // trailing commas
-      .replace(/,\s*([\]}])/g, '$1')
-      .replace(/"https":/g, '"https": "https') // fix https:
-      .trim();
+    const drmMatch = configText.match(/drm:\s*\{([^}]+)\}/);
+    let drm = {};
+    if (drmMatch) {
+      const key = drmMatch[1].match(/["']([^"']+)["']\s*:\s*["']([^"']+)["']/);
+      if (key) drm[key[1]] = key[2];
+    }
 
-    const streamConfig = JSON.parse(raw);
+    const streamConfig = { name, mpd, token, referer, userAgent, drm };
 
     // UI Update
-    document.getElementById('chName').textContent = streamConfig.name || `Channel ${id}`;
+    document.getElementById('chName').textContent = streamConfig.name;
     document.getElementById('title').textContent = streamConfig.name + " — Tata Play";
     document.getElementById('status').style.display = 'none';
 
     initPlayer(streamConfig);
 
   } catch (e) {
-    console.error("Full Error:", e);
-    document.getElementById('status').innerHTML = `❌ Parse Error<br><small>Check Console</small>`;
+    console.error(e);
+    document.getElementById('status').innerHTML = `❌ Failed to load<br><small>Try again</small>`;
   }
 }
 
@@ -101,15 +103,19 @@ function initPlayer(config) {
     }
   });
 
-  player.load(config.mpd).then(() => {
-    console.log("Stream Loaded Successfully");
-  }).catch(err => {
-    console.error(err);
-    alert("Failed to play stream");
-  });
+  player.load(config.mpd)
+    .then(() => console.log("✅ Stream Started!"))
+    .catch(err => {
+      console.error(err);
+      alert("Stream load failed. Token may be expired.");
+    });
 }
 
 if (id) fetchStreamConfig();
+else document.getElementById('status').textContent = "No Channel ID";
+</script>
+</body>
+</html>if (id) fetchStreamConfig();
 else document.getElementById('status').textContent = "No ID in URL";
 </script>
 </body>
