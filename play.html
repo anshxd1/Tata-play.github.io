@@ -60,6 +60,7 @@ HEADER
 
 .header{
   position:fixed;
+
   top:0;
   left:0;
 
@@ -162,7 +163,7 @@ PLAYER
 }
 
 /* =========================
-SHAKA CONTAINER
+SHAKA
 ========================= */
 
 .shaka-video-container{
@@ -179,16 +180,18 @@ video{
   width:100% !important;
   height:100% !important;
 
-  object-fit:contain !important;
+  object-fit:cover !important;
 
   background:#000 !important;
 }
 
 /* =========================
-SHAKA CONTROLS
+FORCE SHAKA CONTROLS
 ========================= */
 
 .shaka-controls-container{
+  display:flex !important;
+
   opacity:1 !important;
   visibility:visible !important;
 
@@ -204,10 +207,6 @@ SHAKA CONTROLS
 }
 
 .shaka-fullscreen-button{
-  display:flex !important;
-}
-
-.shaka-overflow-menu-button{
   display:flex !important;
 }
 
@@ -546,8 +545,6 @@ UI CONFIG
 
 controls.configure({
 
-addSeekBar:true,
-
 controlPanelElements:[
 
 'play_pause',
@@ -560,21 +557,7 @@ controlPanelElements:[
 
 'volume',
 
-'fullscreen',
-
-'overflow_menu'
-
-],
-
-overflowMenuButtons:[
-
-'quality',
-
-'language',
-
-'playback_rate',
-
-'picture_in_picture'
+'fullscreen'
 
 ]
 
