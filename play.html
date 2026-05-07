@@ -180,45 +180,75 @@ video{
 }
 
 /* =========================
-FIX CONTROLS
+MOBILE-FIXED CONTROLS
 ========================= */
 
 .shaka-controls-container{
-
   opacity:1 !important;
   visibility:visible !important;
-
+  height:100% !important;
 }
 
 .shaka-bottom-controls{
-
   display:flex !important;
-
+  flex-direction:row !important;
+  justify-content:space-between !important;
+  align-items:center !important;
+  width:100% !important;
+  padding:8px 12px !important;
+  background:rgba(0,0,0,0.85) !important;
+  border-radius:0 !important;
+  gap:8px !important;
 }
 
 .shaka-seek-bar-container{
-
   display:flex !important;
-
+  flex:1 !important;
+  min-width:0 !important;
+  max-width:60% !important;
 }
 
-.shaka-fullscreen-button{
+.shaka-seek-bar{
+  flex:1 !important;
+  height:4px !important;
+  background:rgba(255,255,255,0.3) !important;
+  border-radius:2px !important;
+}
 
+.shaka-scrub-thumb{
+  background:#fff !important;
+  border-radius:50% !important;
+  width:12px !important;
+  height:12px !important;
+}
+
+.shaka-fullscreen-button,
+.shaka-mute-button,
+.shaka-volume-container{
   display:flex !important;
-
+  min-width:44px !important;
+  height:44px !important;
+  align-items:center !important;
+  justify-content:center !important;
+  background:rgba(255,255,255,0.1) !important;
+  border-radius:50% !important;
+  color:#fff !important;
+  font-size:18px !important;
 }
 
 .shaka-current-time,
 .shaka-time-duration{
-
-  display:block !important;
-
+  display:flex !important;
+  align-items:center !important;
+  color:#fff !important;
+  font-size:14px !important;
+  font-weight:500 !important;
+  min-width:50px !important;
+  padding:0 8px !important;
 }
 
 .shaka-small-play-button{
-
   display:none !important;
-
 }
 
 /* =========================
@@ -267,15 +297,82 @@ video:-webkit-full-screen,
 }
 
 /* =========================
-MOBILE
+MOBILE SPECIFIC
 ========================= */
 
 @media(max-width:768px){
 
   .player-container{
-
     height:calc(100dvh - 64px);
+  }
 
+  /* MOBILE CONTROL ENHANCEMENTS */
+  .shaka-bottom-controls{
+    padding:12px 16px !important;
+    gap:12px !important;
+  }
+
+  .shaka-seek-bar-container{
+    max-width:50% !important;
+  }
+
+  .shaka-current-time,
+  .shaka-time-duration{
+    font-size:13px !important;
+    min-width:40px !important;
+    padding:0 6px !important;
+  }
+
+  .shaka-fullscreen-button,
+  .shaka-mute-button,
+  .shaka-volume-container{
+    min-width:48px !important;
+    height:48px !important;
+    font-size:20px !important;
+  }
+
+  /* TOUCH FRIENDLY */
+  .shaka-seek-bar{
+    height:6px !important;
+  }
+
+  .shaka-scrub-thumb{
+    width:16px !important;
+    height:16px !important;
+  }
+
+  /* HIDE HEADER IN FULLSCREEN ON MOBILE */
+  .header{
+    z-index:1000 !important;
+  }
+
+  video:fullscreen ~ .header,
+  .shaka-video-container:fullscreen ~ .header{
+    display:none !important;
+  }
+
+}
+
+/* =========================
+SMALL MOBILE (iPhone SE etc.)
+========================= */
+
+@media(max-width:480px){
+
+  .shaka-bottom-controls{
+    flex-wrap:nowrap !important;
+    padding:10px 12px !important;
+  }
+
+  .shaka-seek-bar-container{
+    max-width:45% !important;
+  }
+
+  .shaka-current-time,
+  .shaka-time-duration{
+    font-size:12px !important;
+    min-width:35px !important;
+    padding:0 4px !important;
   }
 
 }
@@ -519,7 +616,7 @@ const player =
 new shaka.Player(video);
 
 /* =========================
-UI
+UI - MOBILE OPTIMIZED
 ========================= */
 
 const ui =
@@ -530,23 +627,30 @@ video
 );
 
 ui.configure({
-
-controlPanelElements:[
-
-'play_pause',
-
-'time_and_duration',
-
-'spacer',
-
-'mute',
-
-'volume',
-
-'fullscreen'
-
-]
-
+  
+  controlPanelElements:[
+    'play_pause',
+    'mute',
+    'volume',
+    'time_and_duration',
+    'spacer',
+    'fullscreen'
+  ],
+  
+  // MOBILE TOUCH SETTINGS
+  seekBarColors: {
+    base: 'rgba(255, 255, 255, 0.3)',
+    buffered: 'rgba(255, 255, 255, 0.5)',
+    played: 'rgba(255, 255, 255, 1)'
+  },
+  
+  showUnbufferedStart: false,
+  doubleClickForFullscreen: true,
+  
+  // Ensure controls are always visible on mobile
+  fadeAfter: 3000,
+  showOnLoadStart: true
+  
 });
 
 /* =========================
