@@ -3,49 +3,30 @@
 <head>
 
 <meta charset="UTF-8">
-
-<meta
-name="viewport"
-content="width=device-width,initial-scale=1.0,viewport-fit=cover"
-/>
-
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <title>Tata Play</title>
 
 <!-- SHAKA CORE -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.5/shaka-player.compiled.min.js"></script>
 
 <!-- SHAKA UI -->
-<link
-rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.5/controls.min.css"
-/>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.5/controls.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.5/shaka-player.ui.min.js"></script>
 
 <style>
-
-/* =========================
-RESET
-========================= */
-
 *{
   margin:0;
   padding:0;
   box-sizing:border-box;
 }
 
-html,
-body{
+html,body{
   width:100%;
   height:100%;
   background:#000;
   overflow:hidden;
-  font-family:sans-serif;
+  font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
 }
-
-/* =========================
-APP
-========================= */
 
 .app{
   width:100%;
@@ -54,707 +35,360 @@ APP
   position:relative;
 }
 
-/* =========================
-HEADER
-========================= */
-
 .header{
-
   position:fixed;
-
   top:0;
   left:0;
-
   width:100%;
   height:64px;
-
   display:flex;
   align-items:center;
   gap:14px;
-
   padding:0 16px;
-
-  background:rgba(0,0,0,.72);
-
+  background:rgba(0,0,0,.85);
   backdrop-filter:blur(10px);
-
   z-index:9999;
-
-  border-bottom:
-  1px solid rgba(255,255,255,.08);
-
+  border-bottom:1px solid rgba(255,255,255,.08);
 }
 
 .back-btn{
-
   width:42px;
   height:42px;
-
   border-radius:50%;
-
   display:flex;
   align-items:center;
   justify-content:center;
-
   text-decoration:none;
-
   color:#fff;
-
   font-size:20px;
-
   background:rgba(255,255,255,.08);
-
 }
 
-.channel-info{
-
-  display:flex;
-  align-items:center;
-  gap:12px;
-
-}
-
-.channel-logo{
-
-  width:42px;
-  height:42px;
-
-  border-radius:50%;
-
-  object-fit:cover;
-
-  background:#fff;
-
-}
-
-.channel-meta h1{
-
-  color:#fff;
-  font-size:16px;
-
-}
-
-.channel-meta p{
-
-  color:#aaa;
-  font-size:12px;
-
-}
-
-/* =========================
-PLAYER
-========================= */
+.channel-info{display:flex;align-items:center;gap:12px;}
+.channel-logo{width:42px;height:42px;border-radius:50%;object-fit:cover;background:#fff;}
+.channel-meta h1{color:#fff;font-size:16px;}
+.channel-meta p{color:#aaa;font-size:12px;}
 
 .player-container{
-
   position:absolute;
-
   top:64px;
   left:0;
-
   width:100%;
   height:calc(100vh - 64px);
-
   background:#000;
-
-}
-
-.shaka-video-container{
-
-  width:100% !important;
-  height:100% !important;
-
-  background:#000 !important;
-
-}
-
-video{
-
-  width:100% !important;
-  height:100% !important;
-
-  object-fit:contain !important;
-
-  background:#000 !important;
-
 }
 
 /* =========================
-MOBILE-FIXED CONTROLS
+SHAKA MOBILE CONTROLS - FORCE VISIBLE
 ========================= */
-
-.shaka-controls-container{
+.shaka-controls-container,
+.shaka-mobile-controls-container{
   opacity:1 !important;
   visibility:visible !important;
-  height:100% !important;
+  display:flex !important;
+  pointer-events:auto !important;
+  z-index:999 !important;
 }
 
-.shaka-bottom-controls{
+.shaka-bottom-controls,
+.shaka-mobile-bottom-controls{
   display:flex !important;
-  flex-direction:row !important;
+  width:100% !important;
+  padding:12px 16px !important;
+  background:rgba(0,0,0,0.9) !important;
   justify-content:space-between !important;
   align-items:center !important;
-  width:100% !important;
-  padding:8px 12px !important;
-  background:rgba(0,0,0,0.85) !important;
+  gap:12px !important;
+  position:relative !important;
   border-radius:0 !important;
-  gap:8px !important;
+  min-height:56px !important;
 }
 
-.shaka-seek-bar-container{
+.shaka-seek-bar-container,
+.shaka-mobile-seek-bar-container{
   display:flex !important;
   flex:1 !important;
-  min-width:0 !important;
-  max-width:60% !important;
+  max-width:50% !important;
+  margin:0 12px !important;
 }
 
-.shaka-seek-bar{
+.shaka-seek-bar,
+.shaka-mobile-seek-bar{
   flex:1 !important;
-  height:4px !important;
+  height:6px !important;
   background:rgba(255,255,255,0.3) !important;
-  border-radius:2px !important;
+  border-radius:3px !important;
+  cursor:pointer !important;
 }
 
-.shaka-scrub-thumb{
+.shaka-scrub-thumb,
+.shaka-mobile-scrub-thumb{
   background:#fff !important;
+  border:2px solid #000 !important;
   border-radius:50% !important;
-  width:12px !important;
-  height:12px !important;
+  width:18px !important;
+  height:18px !important;
+  transform:translate(-50%,-50%) !important;
 }
 
+/* CONTROL BUTTONS */
 .shaka-fullscreen-button,
 .shaka-mute-button,
-.shaka-volume-container{
+.shaka-unmute-button,
+.shaka-volume-up,
+.shaka-volume-down,
+.shaka-play-button,
+.shaka-pause-button{
   display:flex !important;
-  min-width:44px !important;
-  height:44px !important;
+  width:48px !important;
+  height:48px !important;
   align-items:center !important;
   justify-content:center !important;
-  background:rgba(255,255,255,0.1) !important;
+  background:rgba(255,255,255,0.15) !important;
   border-radius:50% !important;
   color:#fff !important;
-  font-size:18px !important;
+  font-size:20px !important;
+  border:none !important;
+  cursor:pointer !important;
+  flex-shrink:0 !important;
 }
 
 .shaka-current-time,
-.shaka-time-duration{
+.shaka-time-duration,
+.shaka-mobile-current-time,
+.shaka-mobile-time-duration{
   display:flex !important;
-  align-items:center !important;
   color:#fff !important;
   font-size:14px !important;
   font-weight:500 !important;
-  min-width:50px !important;
-  padding:0 8px !important;
+  font-family:monospace !important;
+  min-width:45px !important;
+  padding:4px 8px !important;
+  background:rgba(0,0,0,0.5) !important;
+  border-radius:4px !important;
 }
 
-.shaka-small-play-button{
+/* HIDE DUPLICATES */
+.shaka-small-play-button,
+.shaka-big-play-button{
   display:none !important;
 }
 
-/* =========================
-STATUS
-========================= */
-
-.status{
-
-  position:absolute;
-
-  top:50%;
-  left:50%;
-
-  transform:translate(-50%,-50%);
-
-  color:#fff;
-
-  z-index:99999;
-
-  background:rgba(0,0,0,.75);
-
-  padding:14px 20px;
-
-  border-radius:12px;
-
+video{
+  width:100% !important;
+  height:100% !important;
+  object-fit:contain !important;
+  background:#000 !important;
 }
 
-/* =========================
-FULLSCREEN
-========================= */
+.status{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  color:#fff;
+  z-index:99999;
+  background:rgba(0,0,0,.85);
+  padding:16px 24px;
+  border-radius:12px;
+  font-size:16px;
+}
 
+/* FULLSCREEN */
 video:fullscreen,
 .shaka-video-container:fullscreen{
-
   width:100vw !important;
   height:100vh !important;
-
+  z-index:99999 !important;
 }
 
 video:-webkit-full-screen,
 .shaka-video-container:-webkit-full-screen{
-
   width:100vw !important;
   height:100vh !important;
-
 }
 
-/* =========================
-MOBILE SPECIFIC
-========================= */
-
+/* MOBILE SPECIFIC */
 @media(max-width:768px){
-
-  .player-container{
-    height:calc(100dvh - 64px);
+  .player-container{height:calc(100dvh - 64px);}
+  
+  .shaka-bottom-controls,
+  .shaka-mobile-bottom-controls{
+    padding:16px !important;
+    gap:16px !important;
   }
-
-  /* MOBILE CONTROL ENHANCEMENTS */
-  .shaka-bottom-controls{
-    padding:12px 16px !important;
-    gap:12px !important;
+  
+  .shaka-seek-bar,
+  .shaka-mobile-seek-bar{
+    height:8px !important;
   }
-
-  .shaka-seek-bar-container{
-    max-width:50% !important;
+  
+  .shaka-scrub-thumb,
+  .shaka-mobile-scrub-thumb{
+    width:22px !important;
+    height:22px !important;
   }
-
-  .shaka-current-time,
-  .shaka-time-duration{
-    font-size:13px !important;
-    min-width:40px !important;
-    padding:0 6px !important;
-  }
-
+  
   .shaka-fullscreen-button,
   .shaka-mute-button,
-  .shaka-volume-container{
-    min-width:48px !important;
-    height:48px !important;
-    font-size:20px !important;
+  .shaka-unmute-button{
+    width:52px !important;
+    height:52px !important;
+    font-size:22px !important;
   }
-
-  /* TOUCH FRIENDLY */
-  .shaka-seek-bar{
-    height:6px !important;
-  }
-
-  .shaka-scrub-thumb{
-    width:16px !important;
-    height:16px !important;
-  }
-
-  /* HIDE HEADER IN FULLSCREEN ON MOBILE */
-  .header{
-    z-index:1000 !important;
-  }
-
+  
+  /* FULLSCREEN HEADER HIDE */
   video:fullscreen ~ .header,
   .shaka-video-container:fullscreen ~ .header{
     display:none !important;
   }
-
 }
-
-/* =========================
-SMALL MOBILE (iPhone SE etc.)
-========================= */
 
 @media(max-width:480px){
-
-  .shaka-bottom-controls{
-    flex-wrap:nowrap !important;
-    padding:10px 12px !important;
-  }
-
-  .shaka-seek-bar-container{
+  .shaka-seek-bar-container,
+  .shaka-mobile-seek-bar-container{
     max-width:45% !important;
   }
-
+  
   .shaka-current-time,
   .shaka-time-duration{
-    font-size:12px !important;
-    min-width:35px !important;
-    padding:0 4px !important;
+    font-size:13px !important;
+    min-width:40px !important;
   }
-
 }
-
 </style>
 
 </head>
 <body>
 
 <div class="app">
-
-<!-- HEADER -->
-
 <header class="header">
-
-<a
-href="index.html"
-class="back-btn"
->
-←
-</a>
-
+<a href="index.html" class="back-btn">←</a>
 <div class="channel-info">
-
-<img
-id="channelLogo"
-class="channel-logo"
-src=""
-alt=""
->
-
+<img id="channelLogo" class="channel-logo" src="" alt="">
 <div class="channel-meta">
-
-<h1 id="channelName">
-Loading...
-</h1>
-
-<p>
-Tata Play
-</p>
-
+<h1 id="channelName">Loading...</h1>
+<p>Tata Play</p>
 </div>
-
 </div>
-
 </header>
 
-<!-- PLAYER -->
-
-<div
-class="player-container"
-data-shaka-player-container
->
-
-<video
-id="video"
-autoplay
-playsinline
-webkit-playsinline
-muted
-></video>
-
+<div class="player-container" data-shaka-player-container>
+<video id="video" autoplay playsinline webkit-playsinline muted></video>
 </div>
 
-<!-- STATUS -->
-
-<div
-id="status"
-class="status"
->
-Loading stream...
-</div>
-
+<div id="status" class="status">Loading stream...</div>
 </div>
 
 <script>
-
-/* =========================
-GET CHANNEL ID
-========================= */
-
-const id =
-new URLSearchParams(
-location.search
-).get("id");
-
-/* =========================
-FETCH STREAM CONFIG
-========================= */
+const id = new URLSearchParams(location.search).get("id");
 
 async function getConfig(){
+  try{
+    const target = `https://allinonereborn.online/tplay/play.php?id=${id}`;
+    const proxy = `https://corsproxy.io/?${encodeURIComponent(target)}`;
+    const res = await fetch(proxy);
+    const html = await res.text();
 
-try{
+    const configMatch = html.match(/const streamConfig\s*=\s*(\{[\s\S]*?\});/);
+    if(!configMatch) throw new Error("Config not found");
 
-const target =
-`https://allinonereborn.online/tplay/play.php?id=${id}`;
+    const configText = configMatch[1];
+    const name = configText.match(/name:\s*["']([^"']+)["']/)?.[1] || "Channel";
+    const mpd = configText.match(/mpd:\s*["']([^"']+)["']/)?.[1] || "";
+    const token = configText.match(/token:\s*["']([^"']+)["']/)?.[1] || "";
+    
+    const drmKey = configText.match(/["']([a-zA-Z0-9]+)["']\s*:\s*["']([a-zA-Z0-9]+)["']/);
+    let drm = {};
+    if(drmKey) drm[drmKey[1]] = drmKey[2];
 
-const proxy =
-`https://corsproxy.io/?${encodeURIComponent(target)}`;
+    const logo = html.match(/const CHANNEL_LOGO = ["']([^"']+)["']/)?.[1] || "";
 
-const res =
-await fetch(proxy);
+    document.title = name;
+    document.getElementById("channelName").innerText = name;
+    document.getElementById("channelLogo").src = logo;
+    document.getElementById("status").style.display = "none";
 
-const html =
-await res.text();
-
-/* =========================
-GET STREAM CONFIG
-========================= */
-
-const configMatch =
-html.match(
-/const streamConfig\s*=\s*(\{[\s\S]*?\});/
-);
-
-if(!configMatch){
-
-throw new Error(
-"Config not found"
-);
-
+    startPlayer({mpd, token, drm});
+  }catch(err){
+    console.error(err);
+    document.getElementById("status").innerHTML = "❌ Failed to load stream";
+  }
 }
-
-const configText =
-configMatch[1];
-
-const name =
-configText.match(
-/name:\s*["']([^"']+)["']/
-)?.[1] || "Channel";
-
-const mpd =
-configText.match(
-/mpd:\s*["']([^"']+)["']/
-)?.[1] || "";
-
-const token =
-configText.match(
-/token:\s*["']([^"']+)["']/
-)?.[1] || "";
-
-const drmKey =
-configText.match(
-/["']([a-zA-Z0-9]+)["']\s*:\s*["']([a-zA-Z0-9]+)["']/
-);
-
-let drm = {};
-
-if(drmKey){
-
-drm[drmKey[1]] =
-drmKey[2];
-
-}
-
-/* =========================
-LOGO
-========================= */
-
-const logo =
-html.match(
-/const CHANNEL_LOGO = ["']([^"']+)["']/
-)?.[1] || "";
-
-/* =========================
-UPDATE UI
-========================= */
-
-document.title = name;
-
-document.getElementById(
-"channelName"
-).innerText = name;
-
-document.getElementById(
-"channelLogo"
-).src = logo;
-
-document.getElementById(
-"status"
-).style.display = "none";
-
-/* =========================
-START PLAYER
-========================= */
-
-startPlayer({
-mpd,
-token,
-drm
-});
-
-}catch(err){
-
-console.error(err);
-
-document.getElementById(
-"status"
-).innerHTML =
-"❌ Failed to load stream";
-
-}
-
-}
-
-/* =========================
-START PLAYER
-========================= */
 
 async function startPlayer(config){
-
-shaka.polyfill.installAll();
-
-if(
-!shaka.Player.isBrowserSupported()
-){
-
-alert(
-"Browser not supported"
-);
-
-return;
-
-}
-
-const video =
-document.getElementById(
-"video"
-);
-
-const container =
-document.querySelector(
-".player-container"
-);
-
-/* =========================
-PLAYER
-========================= */
-
-const player =
-new shaka.Player(video);
-
-/* =========================
-UI - MOBILE OPTIMIZED
-========================= */
-
-const ui =
-new shaka.ui.Overlay(
-player,
-container,
-video
-);
-
-ui.configure({
+  shaka.polyfill.installAll();
   
-  controlPanelElements:[
-    'play_pause',
-    'mute',
-    'volume',
-    'time_and_duration',
-    'spacer',
-    'fullscreen'
-  ],
+  if(!shaka.Player.isBrowserSupported()){
+    alert("Browser not supported");
+    return;
+  }
+
+  const video = document.getElementById("video");
+  const container = document.querySelector(".player-container");
+  const player = new shaka.Player(video);
+
+  // MOBILE-OPTIMIZED UI CONFIG
+  const ui = new shaka.ui.Overlay(player, container, video);
   
-  // MOBILE TOUCH SETTINGS
-  seekBarColors: {
-    base: 'rgba(255, 255, 255, 0.3)',
-    buffered: 'rgba(255, 255, 255, 0.5)',
-    played: 'rgba(255, 255, 255, 1)'
-  },
-  
-  showUnbufferedStart: false,
-  doubleClickForFullscreen: true,
-  
-  // Ensure controls are always visible on mobile
-  fadeAfter: 3000,
-  showOnLoadStart: true
-  
-});
+  ui.configure({
+    controlPanelElements: [
+      'play_pause',
+      'mute',
+      'volume',
+      'time_and_duration',
+      'seek_bar',
+      'spacer',
+      'fullscreen'
+    ],
+    seekBarColors: {
+      base: 'rgba(255,255,255,0.3)',
+      buffered: 'rgba(255,255,255,0.5)',
+      played: '#fff'
+    },
+    fadeAfter: 4000, // Longer fade on mobile
+    showOnLoadStart: true,
+    doubleClickForFullscreen: true
+  });
 
-/* =========================
-DRM
-========================= */
+  // FORCE MOBILE CONTROLS VISIBLE
+  player.addEventListener('loaded', () => {
+    setTimeout(() => {
+      const controls = container.querySelectorAll('.shaka-controls-container, .shaka-mobile-controls-container');
+      controls.forEach(el => {
+        el.style.opacity = '1';
+        el.style.visibility = 'visible';
+        el.style.display = 'flex';
+      });
+    }, 500);
+  });
 
-player.configure({
+  // DRM
+  player.configure({drm: {clearKeys: config.drm}});
 
-drm:{
-clearKeys:config.drm
+  // TOKEN
+  player.getNetworkingEngine().registerRequestFilter((type, request) => {
+    if((type === shaka.net.NetworkingEngine.RequestType.MANIFEST || 
+        type === shaka.net.NetworkingEngine.RequestType.SEGMENT) && config.token){
+      if(!request.uris[0].includes("__hdnea")){
+        const sep = request.uris[0].includes("?") ? "&" : "?";
+        request.uris[0] += sep + config.token;
+      }
+    }
+  });
+
+  try{
+    await player.load(config.mpd);
+    await video.play();
+  }catch(err){
+    console.error(err);
+    document.getElementById("status").style.display = "block";
+    document.getElementById("status").innerHTML = "❌ Stream failed";
+  }
 }
 
-});
-
-/* =========================
-TOKEN
-========================= */
-
-player
-.getNetworkingEngine()
-.registerRequestFilter(
-(type,request)=>{
-
-if(
-(
-type ===
-shaka.net.NetworkingEngine.RequestType.MANIFEST
-||
-type ===
-shaka.net.NetworkingEngine.RequestType.SEGMENT
-)
-&&
-config.token
-){
-
-if(
-!request.uris[0]
-.includes("__hdnea")
-){
-
-const sep =
-request.uris[0]
-.includes("?")
-?
-"&"
-:
-"?";
-
-request.uris[0] +=
-sep + config.token;
-
-}
-
-}
-
-}
-);
-
-/* =========================
-LOAD STREAM
-========================= */
-
-try{
-
-await player.load(
-config.mpd
-);
-
-await video.play();
-
-}catch(err){
-
-console.error(err);
-
-document.getElementById(
-"status"
-).style.display = "block";
-
-document.getElementById(
-"status"
-).innerHTML =
-"❌ Stream failed";
-
-}
-
-}
-
-/* =========================
-START
-========================= */
-
-if(id){
-
-getConfig();
-
-}else{
-
-document.getElementById(
-"status"
-).innerHTML =
-"No Channel ID";
-
-}
-
+if(id) getConfig();
+else document.getElementById("status").innerHTML = "No Channel ID";
 </script>
 
 </body>
