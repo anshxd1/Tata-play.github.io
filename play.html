@@ -149,10 +149,9 @@ PLAYER AREA
 
 .player-area{
   width:100%;
-  background:#000;
-  position:relative;
+  min-height:100vh;
+  overflow:visible;
 }
-
 /* =========================
 VIDEO CONTAINER
 ========================= */
@@ -179,34 +178,7 @@ VIDEO
   background:#000;
 }
 
-/* =========================
-SHAKA
-========================= */
 
-.shaka-video-container{
-  width:100% !important;
-  height:100% !important;
-
-  overflow:hidden !important;
-
-  background:#000 !important;
-}
-
-.shaka-controls-container{
-  z-index:999999 !important;
-
-  padding-bottom:
-  env(safe-area-inset-bottom) !important;
-}
-
-.shaka-bottom-controls{
-  width:100% !important;
-  box-sizing:border-box !important;
-}
-
-.shaka-overflow-menu{
-  max-height:70vh !important;
-}
 
 /* =========================
 STATUS
@@ -279,6 +251,40 @@ MOBILE FIX
     background:#000;
 
   }
+  /* =========================
+SHAKA MOBILE CONTROLS FIX
+========================= */
+
+.shaka-controls-container{
+  opacity:1 !important;
+  display:flex !important;
+  visibility:visible !important;
+}
+
+.shaka-bottom-controls{
+  display:flex !important;
+  opacity:1 !important;
+  visibility:visible !important;
+}
+
+.shaka-seek-bar-container{
+  display:flex !important;
+  opacity:1 !important;
+  visibility:visible !important;
+}
+
+.shaka-fullscreen-button{
+  display:flex !important;
+}
+
+.shaka-overflow-menu-button{
+  display:flex !important;
+}
+
+.shaka-current-time,
+.shaka-time-duration{
+  display:block !important;
+}
 
 }
 
@@ -659,8 +665,6 @@ shakaPlayer
 request.headers['Referer'] =
 config.referer;
 
-request.headers['User-Agent'] =
-config.userAgent;
 
 if(
 (type ===
@@ -671,8 +675,9 @@ type ===
 shaka.net.NetworkingEngine
 .RequestType.SEGMENT)
 &&
-!request.uris[0]
-.includes('__hdnea')
+config.token
+&&
+!request.uris[0].includes('__hdnea')
 ){
 
 const sep =
@@ -690,11 +695,12 @@ sep + config.token;
 
 }
 );
+  
 
 /* =========================
 LOAD STREAM
 ========================= */
-
+video.controls = true;
 shakaPlayer.load(config.mpd)
 
 .then(async()=>{
