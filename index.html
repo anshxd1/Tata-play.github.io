@@ -654,13 +654,8 @@ async function loadChannels() {
         await new Promise(resolve => setTimeout(resolve, 300));
 
         // ONLINE CHANNELS JSON
-        const response = await fetch(
-            'https://allinonereborn.online/tplay/channels.json?nocache=' + Date.now(),
-            {
-                method: 'GET',
-                cache: 'no-store'
-            }
-        );
+        const response = await fetch('./channels.json?nocache=' + Date.now());
+            
 
         console.log("Fetch Response:", response);
 
