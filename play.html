@@ -16,7 +16,7 @@
       display: flex; align-items: center; gap: 12px; backdrop-filter: blur(12px);
     }
     .back-btn { font-size: 30px; color: white; text-decoration: none; }
-    .loading { text-align:center; margin-top: 40vh; font-size: 18px; color:#aaa; }
+    .status { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 100; }
   </style>
 </head>
 <body>
@@ -26,9 +26,11 @@
     <a href="index.html" class="back-btn">←</a>
     <div>
       <strong id="chName">Loading Channel...</strong><br>
-      <small id="chInfo">Tata Play Live</small>
+      <small id="chInfo">Tata Play</small>
     </div>
   </div>
+
+  <div class="status" id="status">Fetching stream...</div>
 
   <div data-shaka-player-container style="width:100%; height:100%;">
     <video id="video" autoplay muted playsinline></video>
@@ -36,8 +38,8 @@
 </div>
 
 <script>
-// CORS Proxy
-const CORS_PROXY = "https://api.allorigins.win/raw?url=";
+// Better CORS Proxy
+const CORS_PROXY = "https://corsproxy.io/?";
 
 const params = new URLSearchParams(location.search);
 const id = params.get('id');
@@ -48,27 +50,28 @@ if (!id) {
 
 async function fetchStreamConfig() {
   try {
-    document.getElementById('chName').textContent = "Fetching stream config...";
+    document.getElementById('status').textContent = "Fetching config...";
     
     const targetUrl = `https://allinonereborn.online/tplay/play.php?id=${id}`;
     const response = await fetch(CORS_PROXY + encodeURIComponent(targetUrl));
+    
+    if (!response.ok) throw new Error("Proxy error");
+
     const html = await response.text();
 
-    // Extract streamConfig block
+    // Extract streamConfig
     const match = html.match(/const streamConfig\s*=\s*(\{[\s\S]*?\});/);
-    if (!match) throw new Error("Config block not found");
+    if (!match) throw new Error("Config not found");
 
     let configStr = match[1];
 
-    // Smart cleaning
+    // Advanced cleaning
     configStr = configStr
-      .replace(/(\w+):(?=\s*["'{\[])/g, '"$1":')   // keys only before value
+      .replace(/(\w+):/g, '"$1":')
       .replace(/'/g, '"')
       .replace(/,\s*}/g, '}')
-      .replace(/,\s*([\]}])/g, '$1');
-
-    // Fix https: issue
-    configStr = configStr.replace(/"https":/g, '"https": "https');
+      .replace(/,\s*([\]}])/g, '$1')
+      .replace(/"https":/g, '"https": "https');
 
     const streamConfig = JSON.parse(configStr);
 
@@ -76,12 +79,14 @@ async function fetchStreamConfig() {
     document.getElementById('chName').textContent = streamConfig.name || `Channel ${id}`;
     document.getElementById('title').textContent = (streamConfig.name || 'Live') + " — Tata Play";
     document.getElementById('chInfo').textContent = "HD Live";
+    document.getElementById('status').style.display = 'none';
 
     initShakaPlayer(streamConfig);
 
   } catch (err) {
     console.error(err);
-    document.getElementById('chName').innerHTML = `❌ Load Failed<br><small>Check Console (F12)</small>`;
+    document.getElementById('status').innerHTML = `❌ Failed to load<br><small>${err.message}</small>`;
+    document.getElementById('chName').textContent = "Error";
   }
 }
 
@@ -110,10 +115,10 @@ function initShakaPlayer(config) {
   });
 
   player.load(config.mpd)
-    .then(() => console.log("✅ Stream Started Successfully"))
+    .then(() => console.log("✅ Stream Loaded Successfully"))
     .catch(e => {
       console.error(e);
-      alert("Stream failed to load. Token might be expired.");
+      alert("Stream load failed (Token expired?)");
     });
 }
 
