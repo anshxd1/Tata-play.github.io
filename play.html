@@ -16,7 +16,10 @@
       display: flex; align-items: center; gap: 12px;
     }
     .back-btn { font-size: 30px; color: white; text-decoration: none; }
-    .status { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; text-align:center; }
+    .status { 
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+      z-index: 100; text-align:center; background:rgba(0,0,0,0.7); padding:20px; border-radius:12px;
+    }
   </style>
 </head>
 <body>
@@ -24,10 +27,10 @@
 <div class="player-area">
   <div class="header">
     <a href="index.html" class="back-btn">←</a>
-    <div><strong id="chName">Loading...</strong><br><small id="chInfo"></small></div>
+    <div><strong id="chName">Loading Channel...</strong><br><small id="chInfo">Tata Play</small></div>
   </div>
 
-  <div class="status" id="status">Connecting to stream...</div>
+  <div class="status" id="status">Fetching stream config...</div>
 
   <div data-shaka-player-container style="width:100%; height:100%;">
     <video id="video" autoplay muted playsinline></video>
@@ -35,9 +38,7 @@
 </div>
 
 <script>
-// Best working proxy right now
 const CORS_PROXY = "https://corsproxy.io/?";
-
 const id = new URLSearchParams(location.search).get('id');
 
 async function fetchStreamConfig() {
@@ -46,31 +47,33 @@ async function fetchStreamConfig() {
     const res = await fetch(CORS_PROXY + encodeURIComponent(target));
     const html = await res.text();
 
-    // Stronger extraction
-    const configMatch = html.match(/const streamConfig\s*=\s*(\{[\s\S]+?\n\};)/);
-    if (!configMatch) throw new Error("Config not found");
+    // Extract the entire streamConfig object
+    const match = html.match(/const streamConfig\s*=\s*(\{[\s\S]*?\n\s*\};)/);
+    if (!match) throw new Error("Could not find streamConfig");
 
-    let configText = configMatch[1];
+    let raw = match[1];
 
-    // Clean and convert to valid JSON
-    configText = configText
-      .replace(/(\w+):/g, '"$1":')      // unquoted keys
-      .replace(/'/g, '"')               // single quotes
-      .replace(/,\s*}/g, '}')           // trailing commas
-      .replace(/https":/g, 'https": "https'); // fix https issue
+    // Very robust cleaning
+    raw = raw
+      .replace(/(\b\w+\b):/g, '"$1":')     // unquoted keys
+      .replace(/'/g, '"')                  // single to double quotes
+      .replace(/,\s*}/g, '}')              // trailing commas
+      .replace(/,\s*([\]}])/g, '$1')
+      .replace(/"https":/g, '"https": "https') // fix https:
+      .trim();
 
-    const streamConfig = JSON.parse(configText);
+    const streamConfig = JSON.parse(raw);
 
-    // Success
-    document.getElementById('chName').textContent = streamConfig.name;
+    // UI Update
+    document.getElementById('chName').textContent = streamConfig.name || `Channel ${id}`;
     document.getElementById('title').textContent = streamConfig.name + " — Tata Play";
-    document.getElementById('status').style.display = "none";
+    document.getElementById('status').style.display = 'none';
 
     initPlayer(streamConfig);
 
-  } catch(e) {
-    console.error(e);
-    document.getElementById('status').innerHTML = `❌ Error<br><small>${e.message}</small>`;
+  } catch (e) {
+    console.error("Full Error:", e);
+    document.getElementById('status').innerHTML = `❌ Parse Error<br><small>Check Console</small>`;
   }
 }
 
@@ -91,18 +94,23 @@ function initPlayer(config) {
     if (config.referer) request.headers['Referer'] = config.referer;
     if (config.userAgent) request.headers['User-Agent'] = config.userAgent;
 
-    if (request.uris[0].includes("manifest.mpd") || request.uris[0].includes("/output/")) {
-      const sep = request.uris[0].includes("?") ? "&" : "?";
-      request.uris[0] += sep + config.token;
+    const url = request.uris[0];
+    if (url.includes('manifest.mpd') || url.includes('/output/')) {
+      const sep = url.includes('?') ? '&' : '?';
+      request.uris[0] = url + sep + config.token;
     }
   });
 
-  player.load(config.mpd).catch(err => alert("Stream load failed"));
+  player.load(config.mpd).then(() => {
+    console.log("Stream Loaded Successfully");
+  }).catch(err => {
+    console.error(err);
+    alert("Failed to play stream");
+  });
 }
 
-// Start
 if (id) fetchStreamConfig();
-else document.getElementById('status').innerHTML = "No Channel ID";
+else document.getElementById('status').textContent = "No ID in URL";
 </script>
 </body>
 </html>
