@@ -7,7 +7,6 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>TP Binge — Live TV</title>
-  <link rel="shortcut icon" type="image/x-icon" href="https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/imageContent-6895-j6vqhqnc-v2/imageContent-6895-j6vqhqnc-m2.png">
   
   <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,22 +14,20 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 
-  <!-- Shaka Player v4.7.11 (same as play.txt) -->
+  <!-- Shaka Player v4.7.11 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css">
 
   <style>
-    /* ===== DARK THEME (same as play.txt) ===== */
+    /* ===== DARK THEME ===== */
     :root {
       --header-height: 64px;
       --bg-body: #0d0d18;
       --bg-card: #13131f;
       --bg-card2: #1a1a2e;
-      --bg-glass: rgba(19,19,31,0.85);
       --border: rgba(255,255,255,0.07);
       --accent: #e8534a;
       --accent-2: #3b82f6;
-      --accent-glow: rgba(232,83,74,0.25);
       --text-primary: #f0f0f5;
       --text-secondary: #8888aa;
       --text-muted: #555570;
@@ -38,7 +35,6 @@
       --shadow: 0 8px 32px rgba(0,0,0,0.5);
       --radius: 16px;
       --radius-sm: 10px;
-      --radius-xs: 6px;
       --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -46,7 +42,7 @@
     html { background: var(--bg-body); color: var(--text-primary); font-family: 'Outfit', sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
     body { background: var(--bg-body); min-height: 100vh; padding-bottom: 32px; }
 
-    /* ===== HEADER ===== */
+    /* Header */
     .app-header {
       position: sticky;
       top: 0;
@@ -68,7 +64,6 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      letter-spacing: -0.3px;
     }
     .back-btn {
       display: flex;
@@ -82,11 +77,12 @@
       color: var(--text-primary);
       text-decoration: none;
       transition: var(--transition);
+      cursor: pointer;
     }
     .back-btn:hover { background: var(--accent); transform: scale(1.05); }
     .back-btn .material-icons-round { font-size: 20px; }
 
-    /* ===== FULLSCREEN PLAYER AREA (immersive design) ===== */
+    /* Player Area */
     .player-area {
       width: 100%;
       background: #000;
@@ -104,12 +100,8 @@
       height: 100%;
       object-fit: contain;
     }
-    .shaka-video-container {
-      border-radius: 0 !important;
-      overflow: hidden !important;
-    }
 
-    /* ===== INFO SECTION ===== */
+    /* Info Section */
     .info-section {
       max-width: 100%;
       padding: 0 16px;
@@ -133,7 +125,7 @@
       height: 52px;
       border-radius: 50%;
       object-fit: cover;
-      background: #fff;
+      background: #1a1a2e;
       border: 2px solid var(--border);
       flex-shrink: 0;
     }
@@ -188,7 +180,7 @@
     }
     .badge-hd { background: var(--accent-2); color: #fff; }
 
-    /* ===== ACTION BUTTON ===== */
+    /* Action Buttons */
     .action-row {
       display: flex;
       gap: 10px;
@@ -224,7 +216,7 @@
       color: var(--accent);
     }
 
-    /* ===== PROGRAM INFO ===== */
+    /* Current Program */
     .current-program {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -276,7 +268,7 @@
       cursor: pointer;
     }
 
-    /* ===== SIMILAR & RECENT ===== */
+    /* Sections */
     .section-header {
       font-size: 15px;
       font-weight: 700;
@@ -294,7 +286,7 @@
     }
     .scroll-row {
       display: flex;
-      gap: 12px;
+      gap: 14px;
       overflow-x: auto;
       overflow-y: hidden;
       padding-bottom: 8px;
@@ -302,36 +294,68 @@
       -webkit-overflow-scrolling: touch;
     }
     .scroll-row::-webkit-scrollbar { display: none; }
-    .channel-item {
+    
+    /* Channel Card */
+    .channel-card {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 8px;
       min-width: 80px;
       max-width: 80px;
-      text-decoration: none;
       cursor: pointer;
       flex-shrink: 0;
+      text-decoration: none;
     }
     .channel-icon {
       position: relative;
       width: 68px;
       height: 68px;
       border-radius: 50%;
-      background: #fff;
+      background: #1a1a2e;
       border: 2px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: center;
       transition: var(--transition);
+      overflow: hidden;
     }
     .channel-icon img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      border-radius: 50%;
     }
-    .channel-title-sm {
+    .channel-icon:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+    }
+    .heart-overlay {
+      position: absolute;
+      bottom: -4px;
+      right: -4px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      transition: var(--transition);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+    .heart-overlay .material-icons-round {
+      font-size: 13px;
+      color: var(--text-muted);
+      transition: var(--transition);
+    }
+    .heart-overlay.active .material-icons-round {
+      color: var(--accent);
+    }
+    .heart-overlay:active { transform: scale(0.85); }
+    .channel-name-sm {
       font-size: 11px;
       color: var(--text-secondary);
       text-align: center;
@@ -367,34 +391,44 @@
       box-shadow: var(--shadow);
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    
+    /* Loading shimmer */
+    .loading-shimmer {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: linear-gradient(90deg, #1a1a2e 25%, #2a2a3e 50%, #1a1a2e 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
   </style>
 </head>
 <body>
 
-<!-- Header -->
 <header class="app-header">
-  <a href="javascript:history.back()" class="back-btn" aria-label="Back">
+  <div class="back-btn" onclick="history.back()">
     <span class="material-icons-round">arrow_back</span>
-  </a>
+  </div>
   <div class="logo">TP Binge</div>
   <div style="width: 40px;"></div>
 </header>
 
-<!-- Player Area -->
 <div class="player-area">
   <div class="video-container" data-shaka-player-container>
-    <video autoplay muted playsinline webkit-playsinline data-shaka-player id="video"
-           poster="https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/imageContent-6895-j6vqhqnc-v2/imageContent-6895-j6vqhqnc-m2.png"></video>
+    <video autoplay muted playsinline webkit-playsinline data-shaka-player id="video"></video>
   </div>
 </div>
 
-<!-- Info & Recommendations -->
 <div class="info-section">
   <div class="channel-header">
     <div class="channel-identity">
       <img class="channel-logo" id="channelLogo" src="" alt="logo">
       <div class="channel-text">
-        <h1 id="channelName">Star Bharat HD</h1>
+        <h1 id="channelName">Loading...</h1>
         <p id="channelGenre">Live TV</p>
       </div>
     </div>
@@ -411,14 +445,13 @@
     </button>
   </div>
 
-  <!-- EPG / Current Program Mock (demonstrative) -->
   <div class="current-program">
     <div class="program-title" id="programTitle">Currently Airing</div>
     <div class="program-time" id="programTime">--:-- → --:--</div>
     <div class="progress-track"><div class="progress-fill" id="epgProgress" style="width:0%"></div></div>
     <div class="description">
-      <span id="shortDesc">Enjoy non-stop entertainment on Star Bharat HD. Hit shows, dramas, and family favorites.</span>
-      <span id="fullDesc" class="full-desc">Star Bharat delivers powerful storytelling, vibrant characters, and high-voltage drama. From gripping mythological tales to modern family sagas, experience emotions like never before.</span>
+      <span id="shortDesc">Loading program information...</span>
+      <span id="fullDesc" class="full-desc"></span>
       <span class="desc-toggle" onclick="toggleDesc()">More info</span>
     </div>
   </div>
@@ -433,64 +466,60 @@
 <div id="toast" class="toast"></div>
 
 <script>
-  // ---------- Helper functions ----------
-  function showToast(msg) {
-    const toast = document.getElementById('toast');
-    toast.textContent = msg;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2500);
+  // ==================== CHANNELS DATABASE WITH REAL LOGOS ====================
+  const CHANNELS_DB = [
+    { id: "244", name: "Star Bharat HD", logo: "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/imageContent-6895-j6vqhqnc-v2/imageContent-6895-j6vqhqnc-m2.png", genre: "Entertainment", desc: "Non-stop entertainment, hit shows, dramas, and family favorites. Star Bharat delivers powerful storytelling and vibrant characters." },
+    { id: "245", name: "Star Plus HD", logo: "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/starplus_logo.png", genre: "Drama", desc: "Home to India's favorite dramas and reality shows." },
+    { id: "246", name: "Star Gold HD", logo: "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/stargold_logo.png", genre: "Movies", desc: "Bollywood blockbusters and classic hits 24/7." },
+    { id: "247", name: "National Geographic", logo: "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/natgeo_logo.png", genre: "Documentary", desc: "Explore wildlife, science, and adventure." },
+    { id: "248", name: "Star Sports 1", logo: "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/starsports_logo.png", genre: "Sports", desc: "Live cricket, football, and major sporting events." },
+    { id: "249", name: "Colors TV", logo: "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/colors_logo.png", genre: "Entertainment", desc: "Bold content, award-winning shows, and reality TV." },
+    { id: "250", name: "Zee TV", logo: "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/zeetv_logo.png", genre: "Drama", desc: "Iconic dramas and engaging family entertainment." },
+    { id: "251", name: "Sony TV", logo: "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/sonytv_logo.png", genre: "Entertainment", desc: "Top-rated shows, comedy, and reality programs." },
+    { id: "252", name: "MTV India", logo: "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/mtv_logo.png", genre: "Music", desc: "Music, youth shows, and reality adventures." }
+  ];
+
+  // Fallback logo for any channel not found
+  const FALLBACK_LOGO = "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/imageContent-6895-j6vqhqnc-v2/imageContent-6895-j6vqhqnc-m2.png";
+
+  function getChannelInfo(channelId) {
+    return CHANNELS_DB.find(c => c.id == channelId) || { 
+      id: channelId, 
+      name: "Channel", 
+      logo: FALLBACK_LOGO, 
+      genre: "Live TV",
+      desc: "Enjoy live streaming"
+    };
   }
 
-  // localStorage favorites and recents
+  // ==================== STORAGE ====================
   let favorites = JSON.parse(localStorage.getItem('fav_channels') || '[]');
   let recents = JSON.parse(localStorage.getItem('recent_channels') || '[]');
 
   function saveFavorites() { localStorage.setItem('fav_channels', JSON.stringify(favorites)); }
   function saveRecents() { localStorage.setItem('recent_channels', JSON.stringify(recents.slice(0, 12))); }
 
-  // Predefined list of channels (index page style, dynamic configs will be fetched)
-  // For a real app, the channel list would come from your index; here we define some popular ones for recommendations.
-  const CHANNELS_DB = [
-    { id: "244", name: "Star Bharat HD", logo: "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/imageContent-6895-j6vqhqnc-v2/imageContent-6895-j6vqhqnc-m2.png", genre: "Entertainment" },
-    { id: "245", name: "Star Plus HD", logo: "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/starplus-logo.png", genre: "Drama" },
-    { id: "246", name: "Star Gold HD", logo: "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/stargold-logo.png", genre: "Movies" },
-    { id: "247", name: "National Geographic", logo: "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/natgeo-logo.png", genre: "Documentary" },
-    { id: "248", name: "Star Sports 1", logo: "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/starsports-logo.png", genre: "Sports" },
-    { id: "249", name: "Colors TV", logo: "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/colors-logo.png", genre: "Entertainment" },
-    { id: "250", name: "Zee TV", logo: "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/zeetv-logo.png", genre: "Drama" }
-  ];
-
-  // fallback for missing logo - use generic
-  function getLogo(channelId, defaultLogo) {
-    const found = CHANNELS_DB.find(c => c.id == channelId);
-    if(found && found.logo && found.logo.includes('http')) return found.logo;
-    return defaultLogo || "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/imageContent-6895-j6vqhqnc-v2/imageContent-6895-j6vqhqnc-m2.png";
-  }
-
-  // ---------- Fetch stream config via proxy exactly like play1.html (allinonereborn endpoint) ----------
-  let currentChannelId = null;
+  // ==================== SHAKA PLAYER ====================
   let shakaPlayer = null;
   let uiOverlay = null;
+  let currentChannelId = null;
 
   async function fetchAndPlayChannel(channelId) {
     if (!channelId) return;
     currentChannelId = channelId;
-    document.getElementById('statusMsg')?.remove?.(); // no explicit status, toast usage
-    showToast(`Loading ${CHANNELS_DB.find(c=>c.id==channelId)?.name || 'channel'}...`);
+    const channelInfo = getChannelInfo(channelId);
+    showToast(`Loading ${channelInfo.name}...`);
     
     try {
-      // Use CORS proxy to fetch config from allinonereborn (same as play1.html logic)
       const targetUrl = `https://allinonereborn.online/tplay/play.php?id=${channelId}`;
       const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
       const resp = await fetch(proxyUrl);
       const htmlText = await resp.text();
       
-      // Extract streamConfig object from script
       const configMatch = htmlText.match(/const streamConfig\s*=\s*(\{[\s\S]*?\});/);
-      if (!configMatch) throw new Error("Stream config not found in page");
+      if (!configMatch) throw new Error("Stream config not found");
       const configText = configMatch[1];
       
-      // parse fields exactly like play1 extractor
       const nameMatch = configText.match(/name:\s*["']([^"']+)["']/);
       const mpdMatch = configText.match(/mpd:\s*["']([^"']+)["']/);
       const tokenMatch = configText.match(/token:\s*["']([^"']+)["']/);
@@ -499,41 +528,38 @@
       const refererMatch = configText.match(/referer:\s*["']([^"']+)["']/);
       const userAgentMatch = configText.match(/userAgent:\s*["']([^"']+)["']/);
       
-      const channelName = nameMatch ? nameMatch[1] : "Channel";
+      const channelName = nameMatch ? nameMatch[1] : channelInfo.name;
       const mpd = mpdMatch ? mpdMatch[1] : "";
       const token = tokenMatch ? tokenMatch[1] : "";
       let drm = {};
       if (drmMatch) drm[drmMatch[1]] = drmMatch[2];
-      const channelLogo = logoMatch ? logoMatch[1] : getLogo(channelId, "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/imageContent-6895-j6vqhqnc-v2/imageContent-6895-j6vqhqnc-m2.png");
+      const channelLogo = (logoMatch ? logoMatch[1] : channelInfo.logo) || FALLBACK_LOGO;
       const referer = refererMatch ? refererMatch[1] : "https://www.tataplaybinge.com/";
-      const userAgent = userAgentMatch ? userAgentMatch[1] : "Mozilla/5.0 (Linux; Android 13; SM-S918B) AppleWebKit/537.36 Chrome/124.0.0.0 Mobile Safari/537.36";
+      const userAgent = userAgentMatch ? userAgentMatch[1] : "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36";
       
       // Update UI
       document.title = `${channelName} | TP Binge`;
       document.getElementById('channelName').innerText = channelName;
       document.getElementById('channelLogo').src = channelLogo;
-      document.getElementById('channelGenre').innerText = "Live TV • Tata Play";
+      document.getElementById('channelGenre').innerText = channelInfo.genre;
+      document.getElementById('shortDesc').innerText = channelInfo.desc;
+      document.getElementById('fullDesc').innerText = channelInfo.desc + " Watch epic entertainment, dramas, and more only on TP Binge.";
       
-      // Update favorite button state
       updateFavoriteButtonUI(channelId);
-      
-      // Save to recently watched
       addToRecentlyWatched(channelId, channelName, channelLogo);
       renderRecentlyWatched();
+      renderSimilarChannels();
       
-      // Initialize Shaka Player or reinit
       initShakaPlayer(mpd, token, drm, referer, userAgent);
       
-      // After loading, try to play in case autoplay blocked
-      setTimeout(() => { const vid = document.getElementById('video'); if(vid) vid.play().catch(e=>console.log("play",e)); }, 500);
+      setTimeout(() => { const vid = document.getElementById('video'); if(vid) vid.play().catch(e => console.log("autoplay", e)); }, 500);
       
     } catch (err) {
-      console.error("fetch error:", err);
-      showToast("Failed to load channel stream. Check ID or network.");
+      console.error(err);
+      showToast("Failed to load stream. Try another channel.");
     }
   }
-  
-  // Shaka initialization (based on play.txt but dynamic DRM/token)
+
   function initShakaPlayer(mpdUrl, token, drmKeys, referer, userAgent) {
     const videoEl = document.getElementById('video');
     const container = document.querySelector('[data-shaka-player-container]');
@@ -548,7 +574,6 @@
       return;
     }
     shakaPlayer = new shaka.Player(videoEl);
-    // UI overlay
     if (uiOverlay) uiOverlay.destroy();
     uiOverlay = new shaka.ui.Overlay(shakaPlayer, container, videoEl);
     uiOverlay.configure({
@@ -557,11 +582,10 @@
       seekBarColors: { base: 'rgba(255,255,255,0.2)', buffered: 'rgba(255,255,255,0.4)', played: '#e8534a' }
     });
     
-    // DRM config
     if (drmKeys && Object.keys(drmKeys).length) {
       shakaPlayer.configure({ drm: { clearKeys: drmKeys } });
     }
-    // Networking filter for token and headers
+    
     shakaPlayer.getNetworkingEngine().clearAllRequestFilters();
     shakaPlayer.getNetworkingEngine().registerRequestFilter((type, request) => {
       if (referer) request.headers['Referer'] = referer;
@@ -574,13 +598,10 @@
       }
     });
     
-    shakaPlayer.load(mpdUrl).then(() => {
-      console.log("Stream loaded:", mpdUrl);
-      showToast("Stream ready");
-    }).catch(e => { console.error(e); showToast("Playback error, try again"); });
+    shakaPlayer.load(mpdUrl).catch(e => { console.error(e); showToast("Playback error"); });
   }
-  
-  // Favorites management
+
+  // ==================== FAVORITES ====================
   function updateFavoriteButtonUI(channelId) {
     const isFav = favorites.includes(channelId);
     const favIcon = document.getElementById('favIcon');
@@ -608,9 +629,21 @@
     }
     saveFavorites();
     updateFavoriteButtonUI(currentChannelId);
-    renderSimilarChannels(); // refresh favorite icons in suggestions
+    renderSimilarChannels();
   }
   
+  function toggleFavoriteById(chId, event) {
+    if (event) event.stopPropagation();
+    const idx = favorites.indexOf(chId);
+    if (idx === -1) favorites.push(chId);
+    else favorites.splice(idx, 1);
+    saveFavorites();
+    renderSimilarChannels();
+    if (currentChannelId === chId) updateFavoriteButtonUI(chId);
+    showToast(idx === -1 ? "Added to favorites" : "Removed from favorites");
+  }
+  
+  // ==================== RECENTLY WATCHED ====================
   function addToRecentlyWatched(id, name, logo) {
     recents = recents.filter(cid => cid !== id);
     recents.unshift(id);
@@ -628,96 +661,84 @@
     }
     let html = '';
     for (let rid of recentIds.slice(0, 12)) {
-      const ch = CHANNELS_DB.find(c => c.id == rid);
-      if (!ch) continue;
+      const ch = getChannelInfo(rid);
       html += `
-        <div class="channel-item" onclick="navigateToChannel('${ch.id}')">
-          <div class="channel-icon"><img src="${ch.logo}" loading="lazy" onerror="this.src='https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/imageContent-6895-j6vqhqnc-v2/imageContent-6895-j6vqhqnc-m2.png'"></div>
-          <span class="channel-title-sm">${ch.name}</span>
+        <div class="channel-card" onclick="navigateToChannel('${ch.id}')">
+          <div class="channel-icon">
+            <img src="${ch.logo}" loading="lazy" onerror="this.src='${FALLBACK_LOGO}'">
+          </div>
+          <span class="channel-name-sm">${ch.name}</span>
         </div>
       `;
     }
     container.innerHTML = html;
   }
   
+  // ==================== SIMILAR / POPULAR CHANNELS ====================
   function renderSimilarChannels() {
     const container = document.getElementById('similarChannelsList');
     if (!container) return;
-    // Show top 6 channels from DB excluding current
     let similar = CHANNELS_DB.filter(c => c.id != currentChannelId);
     if (similar.length === 0) {
-      container.innerHTML = '<div class="empty-state">No recommendations</div>';
+      container.innerHTML = '<div class="empty-state">No recommendations available</div>';
       return;
     }
     let html = '';
-    for (let ch of similar.slice(0, 8)) {
+    for (let ch of similar.slice(0, 10)) {
       const isFav = favorites.includes(ch.id);
       html += `
-        <div class="channel-item" onclick="navigateToChannel('${ch.id}')">
+        <div class="channel-card" onclick="navigateToChannel('${ch.id}')">
           <div class="channel-icon">
-            <img src="${ch.logo}" onerror="this.src='https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/imageContent-6895-j6vqhqnc-v2/imageContent-6895-j6vqhqnc-m2.png'">
-            <div class="heart-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavoriteById('${ch.id}')">
+            <img src="${ch.logo}" loading="lazy" onerror="this.src='${FALLBACK_LOGO}'">
+            <div class="heart-overlay ${isFav ? 'active' : ''}" onclick="toggleFavoriteById('${ch.id}', event)">
               <span class="material-icons-round">${isFav ? 'favorite' : 'favorite_border'}</span>
             </div>
           </div>
-          <span class="channel-title-sm">${ch.name}</span>
+          <span class="channel-name-sm">${ch.name}</span>
         </div>
       `;
     }
     container.innerHTML = html;
-  }
-  
-  // Helper: toggle favorite by ID for channel cards
-  function toggleFavoriteById(chId) {
-    const idx = favorites.indexOf(chId);
-    if (idx === -1) favorites.push(chId);
-    else favorites.splice(idx, 1);
-    saveFavorites();
-    renderSimilarChannels();
-    if (currentChannelId === chId) updateFavoriteButtonUI(chId);
-    showToast(idx === -1 ? "Added to favorites" : "Removed from favorites");
   }
   
   function navigateToChannel(chId) {
     if (chId == currentChannelId) return;
-    // Reload player with new channel
     fetchAndPlayChannel(chId);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
   
-  window.navigateToChannel = navigateToChannel;
-  window.toggleFavoriteById = toggleFavoriteById;
-  document.getElementById('favBtn')?.addEventListener('click', toggleFavorite);
-  
-  // EPG mock progress (for visual consistency)
+  // ==================== EPG PROGRESS MOCK ====================
   function updateProgress() {
     const now = new Date();
-    const startHour = 6, endHour = 24; // mock day progress
-    const start = new Date(); start.setHours(startHour,0,0,0);
-    let end = new Date(); end.setHours(endHour,0,0,0);
-    if(now < start) document.getElementById('epgProgress').style.width = '0%';
-    else if(now > end) document.getElementById('epgProgress').style.width = '100%';
+    const startHour = 6, endHour = 24;
+    const start = new Date(); start.setHours(startHour, 0, 0, 0);
+    let end = new Date(); end.setHours(endHour, 0, 0, 0);
+    if (now < start) document.getElementById('epgProgress').style.width = '0%';
+    else if (now > end) document.getElementById('epgProgress').style.width = '100%';
     else {
       const total = end - start;
       const elapsed = now - start;
-      const pct = (elapsed/total)*100;
+      const pct = (elapsed / total) * 100;
       document.getElementById('epgProgress').style.width = pct + '%';
     }
-    // update mock time
-    const progTimeSpan = document.getElementById('programTime');
-    if(progTimeSpan) progTimeSpan.innerText = `${startHour.toString().padStart(2,'0')}:00 → ${endHour.toString().padStart(2,'0')}:00`;
-    const progTitleSpan = document.getElementById('programTitle');
-    if(progTitleSpan && progTitleSpan.innerText === 'Currently Airing') progTitleSpan.innerText = 'Prime Time Entertainments';
+    document.getElementById('programTime').innerText = `${startHour.toString().padStart(2, '0')}:00 → ${endHour.toString().padStart(2, '0')}:00`;
   }
   setInterval(updateProgress, 5000);
   updateProgress();
   
-  // Description toggle
+  // ==================== UTILITIES ====================
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+  
   window.toggleDesc = function() {
     const short = document.getElementById('shortDesc');
     const full = document.getElementById('fullDesc');
     const btn = document.querySelector('.desc-toggle');
-    if(short.classList.contains('hide')) {
+    if (short.classList.contains('hide')) {
       short.classList.remove('hide');
       full.classList.remove('show');
       btn.textContent = 'More info';
@@ -728,29 +749,28 @@
     }
   };
   
-  // Autoplay robust handling
-  function ensurePlay() {
-    const video = document.getElementById('video');
-    if(video && video.paused) { video.play().catch(e=>console.log('autoplay blocked')); }
-  }
+  // ==================== INIT ====================
   document.addEventListener('DOMContentLoaded', () => {
-    // get channel id from URL param "id"
     const urlParams = new URLSearchParams(window.location.search);
     let channelId = urlParams.get('id');
-    if (!channelId) channelId = "244"; // default Star Bharat HD
+    if (!channelId) channelId = "244";
+    
+    document.getElementById('favBtn').addEventListener('click', toggleFavorite);
+    
     fetchAndPlayChannel(channelId);
-    renderRecentlyWatched();
-    renderSimilarChannels();
-    // additional touch events for audio unmute but keep muted initially
+    
     const videoEl = document.getElementById('video');
-    if(videoEl) {
+    if (videoEl) {
       videoEl.muted = true;
-      document.body.addEventListener('touchstart', () => { if(videoEl.muted) videoEl.muted = false; videoEl.play().catch(()=>{}); }, { once: true });
+      document.body.addEventListener('touchstart', () => {
+        if (videoEl.muted) videoEl.muted = false;
+        videoEl.play().catch(() => {});
+      }, { once: true });
     }
   });
   
-  window.addEventListener('load', () => { setTimeout(() => ensurePlay(), 1000); });
+  window.navigateToChannel = navigateToChannel;
+  window.toggleFavoriteById = toggleFavoriteById;
 </script>
-
 </body>
 </html>
