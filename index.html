@@ -539,9 +539,9 @@
     }
 
     function getChannelLink(channelId) {
-        return `player.html?id=${channelId}`;
+    return `play.html?id=${channelId}`;
     }
-
+    
     function escapeHtml(str) {
         if (!str) return '';
         return str.replace(/[&<>]/g, function(m) {
