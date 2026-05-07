@@ -1,394 +1,755 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
-<title>Tata Play</title>
-
-<!-- SHAKA CORE -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.5/shaka-player.compiled.min.js"></script>
-
-<!-- SHAKA UI -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.5/controls.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.5/shaka-player.ui.min.js"></script>
-
-<style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
-
-html,body{
-  width:100%;
-  height:100%;
-  background:#000;
-  overflow:hidden;
-  font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
-}
-
-.app{
-  width:100%;
-  height:100vh;
-  background:#000;
-  position:relative;
-}
-
-.header{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:64px;
-  display:flex;
-  align-items:center;
-  gap:14px;
-  padding:0 16px;
-  background:rgba(0,0,0,.85);
-  backdrop-filter:blur(10px);
-  z-index:9999;
-  border-bottom:1px solid rgba(255,255,255,.08);
-}
-
-.back-btn{
-  width:42px;
-  height:42px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-decoration:none;
-  color:#fff;
-  font-size:20px;
-  background:rgba(255,255,255,.08);
-}
-
-.channel-info{display:flex;align-items:center;gap:12px;}
-.channel-logo{width:42px;height:42px;border-radius:50%;object-fit:cover;background:#fff;}
-.channel-meta h1{color:#fff;font-size:16px;}
-.channel-meta p{color:#aaa;font-size:12px;}
-
-.player-container{
-  position:absolute;
-  top:64px;
-  left:0;
-  width:100%;
-  height:calc(100vh - 64px);
-  background:#000;
-}
-
-/* =========================
-SHAKA MOBILE CONTROLS - FORCE VISIBLE
-========================= */
-.shaka-controls-container,
-.shaka-mobile-controls-container{
-  opacity:1 !important;
-  visibility:visible !important;
-  display:flex !important;
-  pointer-events:auto !important;
-  z-index:999 !important;
-}
-
-.shaka-bottom-controls,
-.shaka-mobile-bottom-controls{
-  display:flex !important;
-  width:100% !important;
-  padding:12px 16px !important;
-  background:rgba(0,0,0,0.9) !important;
-  justify-content:space-between !important;
-  align-items:center !important;
-  gap:12px !important;
-  position:relative !important;
-  border-radius:0 !important;
-  min-height:56px !important;
-}
-
-.shaka-seek-bar-container,
-.shaka-mobile-seek-bar-container{
-  display:flex !important;
-  flex:1 !important;
-  max-width:50% !important;
-  margin:0 12px !important;
-}
-
-.shaka-seek-bar,
-.shaka-mobile-seek-bar{
-  flex:1 !important;
-  height:6px !important;
-  background:rgba(255,255,255,0.3) !important;
-  border-radius:3px !important;
-  cursor:pointer !important;
-}
-
-.shaka-scrub-thumb,
-.shaka-mobile-scrub-thumb{
-  background:#fff !important;
-  border:2px solid #000 !important;
-  border-radius:50% !important;
-  width:18px !important;
-  height:18px !important;
-  transform:translate(-50%,-50%) !important;
-}
-
-/* CONTROL BUTTONS */
-.shaka-fullscreen-button,
-.shaka-mute-button,
-.shaka-unmute-button,
-.shaka-volume-up,
-.shaka-volume-down,
-.shaka-play-button,
-.shaka-pause-button{
-  display:flex !important;
-  width:48px !important;
-  height:48px !important;
-  align-items:center !important;
-  justify-content:center !important;
-  background:rgba(255,255,255,0.15) !important;
-  border-radius:50% !important;
-  color:#fff !important;
-  font-size:20px !important;
-  border:none !important;
-  cursor:pointer !important;
-  flex-shrink:0 !important;
-}
-
-.shaka-current-time,
-.shaka-time-duration,
-.shaka-mobile-current-time,
-.shaka-mobile-time-duration{
-  display:flex !important;
-  color:#fff !important;
-  font-size:14px !important;
-  font-weight:500 !important;
-  font-family:monospace !important;
-  min-width:45px !important;
-  padding:4px 8px !important;
-  background:rgba(0,0,0,0.5) !important;
-  border-radius:4px !important;
-}
-
-/* HIDE DUPLICATES */
-.shaka-small-play-button,
-.shaka-big-play-button{
-  display:none !important;
-}
-
-video{
-  width:100% !important;
-  height:100% !important;
-  object-fit:contain !important;
-  background:#000 !important;
-}
-
-.status{
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  color:#fff;
-  z-index:99999;
-  background:rgba(0,0,0,.85);
-  padding:16px 24px;
-  border-radius:12px;
-  font-size:16px;
-}
-
-/* FULLSCREEN */
-video:fullscreen,
-.shaka-video-container:fullscreen{
-  width:100vw !important;
-  height:100vh !important;
-  z-index:99999 !important;
-}
-
-video:-webkit-full-screen,
-.shaka-video-container:-webkit-full-screen{
-  width:100vw !important;
-  height:100vh !important;
-}
-
-/* MOBILE SPECIFIC */
-@media(max-width:768px){
-  .player-container{height:calc(100dvh - 64px);}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0a0a0f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>TP Binge — Live TV</title>
+  <link rel="shortcut icon" type="image/x-icon" href="https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/imageContent-6895-j6vqhqnc-v2/imageContent-6895-j6vqhqnc-m2.png">
   
-  .shaka-bottom-controls,
-  .shaka-mobile-bottom-controls{
-    padding:16px !important;
-    gap:16px !important;
-  }
-  
-  .shaka-seek-bar,
-  .shaka-mobile-seek-bar{
-    height:8px !important;
-  }
-  
-  .shaka-scrub-thumb,
-  .shaka-mobile-scrub-thumb{
-    width:22px !important;
-    height:22px !important;
-  }
-  
-  .shaka-fullscreen-button,
-  .shaka-mute-button,
-  .shaka-unmute-button{
-    width:52px !important;
-    height:52px !important;
-    font-size:22px !important;
-  }
-  
-  /* FULLSCREEN HEADER HIDE */
-  video:fullscreen ~ .header,
-  .shaka-video-container:fullscreen ~ .header{
-    display:none !important;
-  }
-}
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 
-@media(max-width:480px){
-  .shaka-seek-bar-container,
-  .shaka-mobile-seek-bar-container{
-    max-width:45% !important;
-  }
-  
-  .shaka-current-time,
-  .shaka-time-duration{
-    font-size:13px !important;
-    min-width:40px !important;
-  }
-}
-</style>
+  <!-- Shaka Player v4.7.11 (same as play.txt) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css">
 
+  <style>
+    /* ===== DARK THEME (same as play.txt) ===== */
+    :root {
+      --header-height: 64px;
+      --bg-body: #0d0d18;
+      --bg-card: #13131f;
+      --bg-card2: #1a1a2e;
+      --bg-glass: rgba(19,19,31,0.85);
+      --border: rgba(255,255,255,0.07);
+      --accent: #e8534a;
+      --accent-2: #3b82f6;
+      --accent-glow: rgba(232,83,74,0.25);
+      --text-primary: #f0f0f5;
+      --text-secondary: #8888aa;
+      --text-muted: #555570;
+      --live-red: #e8534a;
+      --shadow: 0 8px 32px rgba(0,0,0,0.5);
+      --radius: 16px;
+      --radius-sm: 10px;
+      --radius-xs: 6px;
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { background: var(--bg-body); color: var(--text-primary); font-family: 'Outfit', sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    body { background: var(--bg-body); min-height: 100vh; padding-bottom: 32px; }
+
+    /* ===== HEADER ===== */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      height: var(--header-height);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      background: rgba(13,13,24,0.92);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+    .logo {
+      font-size: 20px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), #ff8a65);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.3px;
+    }
+    .back-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    .back-btn:hover { background: var(--accent); transform: scale(1.05); }
+    .back-btn .material-icons-round { font-size: 20px; }
+
+    /* ===== FULLSCREEN PLAYER AREA (immersive design) ===== */
+    .player-area {
+      width: 100%;
+      background: #000;
+      position: relative;
+    }
+    .video-container {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #000;
+      position: relative;
+      overflow: hidden;
+    }
+    .video-container video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .shaka-video-container {
+      border-radius: 0 !important;
+      overflow: hidden !important;
+    }
+
+    /* ===== INFO SECTION ===== */
+    .info-section {
+      max-width: 100%;
+      padding: 0 16px;
+    }
+    .channel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 0 14px;
+      gap: 12px;
+    }
+    .channel-identity {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex: 1;
+      min-width: 0;
+    }
+    .channel-logo {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #fff;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+    }
+    .channel-text h1 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 180px;
+    }
+    .channel-text p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 3px;
+    }
+    .badges {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .badge {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .badge-live {
+      background: var(--live-red);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .badge-live::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #fff;
+      animation: livePulse 1.2s ease-in-out infinite;
+    }
+    @keyframes livePulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.7); }
+    }
+    .badge-hd { background: var(--accent-2); color: #fff; }
+
+    /* ===== ACTION BUTTON ===== */
+    .action-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      flex: 1;
+      justify-content: center;
+    }
+    .action-btn .material-icons-round { font-size: 18px; }
+    .action-btn:hover {
+      background: var(--bg-card2);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+    .action-btn.fav-active {
+      background: rgba(232,83,74,0.15);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ===== PROGRAM INFO ===== */
+    .current-program {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 4px;
+    }
+    .program-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+    .program-time {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .progress-track {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #ff8a65);
+      border-radius: 2px;
+      transition: width 1s linear;
+    }
+    .description {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    .full-desc { display: none; }
+    .full-desc.show { display: block; }
+    .short-desc.hide { display: none; }
+    .desc-toggle {
+      display: inline-block;
+      color: var(--accent-2);
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 6px;
+      cursor: pointer;
+    }
+
+    /* ===== SIMILAR & RECENT ===== */
+    .section-header {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 20px 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-header::before {
+      content: '';
+      width: 3px;
+      height: 16px;
+      border-radius: 2px;
+      background: var(--accent);
+    }
+    .scroll-row {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 8px;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .scroll-row::-webkit-scrollbar { display: none; }
+    .channel-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      min-width: 80px;
+      max-width: 80px;
+      text-decoration: none;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .channel-icon {
+      position: relative;
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+    .channel-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    .channel-title-sm {
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-align: center;
+      line-height: 1.3;
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .empty-state {
+      color: var(--text-muted);
+      font-size: 13px;
+      padding: 16px 0;
+      text-align: center;
+    }
+    .toast {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 10px 20px;
+      border-radius: 24px;
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      box-shadow: var(--shadow);
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
 </head>
 <body>
 
-<div class="app">
-<header class="header">
-<a href="index.html" class="back-btn">←</a>
-<div class="channel-info">
-<img id="channelLogo" class="channel-logo" src="" alt="">
-<div class="channel-meta">
-<h1 id="channelName">Loading...</h1>
-<p>Tata Play</p>
-</div>
-</div>
+<!-- Header -->
+<header class="app-header">
+  <a href="javascript:history.back()" class="back-btn" aria-label="Back">
+    <span class="material-icons-round">arrow_back</span>
+  </a>
+  <div class="logo">TP Binge</div>
+  <div style="width: 40px;"></div>
 </header>
 
-<div class="player-container" data-shaka-player-container>
-<video id="video" autoplay playsinline webkit-playsinline muted></video>
+<!-- Player Area -->
+<div class="player-area">
+  <div class="video-container" data-shaka-player-container>
+    <video autoplay muted playsinline webkit-playsinline data-shaka-player id="video"
+           poster="https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/imageContent-6895-j6vqhqnc-v2/imageContent-6895-j6vqhqnc-m2.png"></video>
+  </div>
 </div>
 
-<div id="status" class="status">Loading stream...</div>
+<!-- Info & Recommendations -->
+<div class="info-section">
+  <div class="channel-header">
+    <div class="channel-identity">
+      <img class="channel-logo" id="channelLogo" src="" alt="logo">
+      <div class="channel-text">
+        <h1 id="channelName">Star Bharat HD</h1>
+        <p id="channelGenre">Live TV</p>
+      </div>
+    </div>
+    <div class="badges">
+      <span class="badge badge-live">LIVE</span>
+      <span class="badge badge-hd">HD</span>
+    </div>
+  </div>
+
+  <div class="action-row">
+    <button class="action-btn" id="favBtn">
+      <span class="material-icons-round" id="favIcon">favorite_border</span>
+      <span id="favText">Favorite</span>
+    </button>
+  </div>
+
+  <!-- EPG / Current Program Mock (demonstrative) -->
+  <div class="current-program">
+    <div class="program-title" id="programTitle">Currently Airing</div>
+    <div class="program-time" id="programTime">--:-- → --:--</div>
+    <div class="progress-track"><div class="progress-fill" id="epgProgress" style="width:0%"></div></div>
+    <div class="description">
+      <span id="shortDesc">Enjoy non-stop entertainment on Star Bharat HD. Hit shows, dramas, and family favorites.</span>
+      <span id="fullDesc" class="full-desc">Star Bharat delivers powerful storytelling, vibrant characters, and high-voltage drama. From gripping mythological tales to modern family sagas, experience emotions like never before.</span>
+      <span class="desc-toggle" onclick="toggleDesc()">More info</span>
+    </div>
+  </div>
+
+  <div class="section-header">📺 Popular Channels</div>
+  <div class="scroll-row" id="similarChannelsList"></div>
+
+  <div class="section-header">🕘 Recently Watched</div>
+  <div class="scroll-row" id="recentlyWatchedList"></div>
 </div>
+
+<div id="toast" class="toast"></div>
 
 <script>
-const id = new URLSearchParams(location.search).get("id");
+  // ---------- Helper functions ----------
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
 
-async function getConfig(){
-  try{
-    const target = `https://allinonereborn.online/tplay/play.php?id=${id}`;
-    const proxy = `https://corsproxy.io/?${encodeURIComponent(target)}`;
-    const res = await fetch(proxy);
-    const html = await res.text();
+  // localStorage favorites and recents
+  let favorites = JSON.parse(localStorage.getItem('fav_channels') || '[]');
+  let recents = JSON.parse(localStorage.getItem('recent_channels') || '[]');
 
-    const configMatch = html.match(/const streamConfig\s*=\s*(\{[\s\S]*?\});/);
-    if(!configMatch) throw new Error("Config not found");
+  function saveFavorites() { localStorage.setItem('fav_channels', JSON.stringify(favorites)); }
+  function saveRecents() { localStorage.setItem('recent_channels', JSON.stringify(recents.slice(0, 12))); }
 
-    const configText = configMatch[1];
-    const name = configText.match(/name:\s*["']([^"']+)["']/)?.[1] || "Channel";
-    const mpd = configText.match(/mpd:\s*["']([^"']+)["']/)?.[1] || "";
-    const token = configText.match(/token:\s*["']([^"']+)["']/)?.[1] || "";
+  // Predefined list of channels (index page style, dynamic configs will be fetched)
+  // For a real app, the channel list would come from your index; here we define some popular ones for recommendations.
+  const CHANNELS_DB = [
+    { id: "244", name: "Star Bharat HD", logo: "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/imageContent-6895-j6vqhqnc-v2/imageContent-6895-j6vqhqnc-m2.png", genre: "Entertainment" },
+    { id: "245", name: "Star Plus HD", logo: "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/starplus-logo.png", genre: "Drama" },
+    { id: "246", name: "Star Gold HD", logo: "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/stargold-logo.png", genre: "Movies" },
+    { id: "247", name: "National Geographic", logo: "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/natgeo-logo.png", genre: "Documentary" },
+    { id: "248", name: "Star Sports 1", logo: "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/starsports-logo.png", genre: "Sports" },
+    { id: "249", name: "Colors TV", logo: "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/colors-logo.png", genre: "Entertainment" },
+    { id: "250", name: "Zee TV", logo: "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/zeetv-logo.png", genre: "Drama" }
+  ];
+
+  // fallback for missing logo - use generic
+  function getLogo(channelId, defaultLogo) {
+    const found = CHANNELS_DB.find(c => c.id == channelId);
+    if(found && found.logo && found.logo.includes('http')) return found.logo;
+    return defaultLogo || "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/imageContent-6895-j6vqhqnc-v2/imageContent-6895-j6vqhqnc-m2.png";
+  }
+
+  // ---------- Fetch stream config via proxy exactly like play1.html (allinonereborn endpoint) ----------
+  let currentChannelId = null;
+  let shakaPlayer = null;
+  let uiOverlay = null;
+
+  async function fetchAndPlayChannel(channelId) {
+    if (!channelId) return;
+    currentChannelId = channelId;
+    document.getElementById('statusMsg')?.remove?.(); // no explicit status, toast usage
+    showToast(`Loading ${CHANNELS_DB.find(c=>c.id==channelId)?.name || 'channel'}...`);
     
-    const drmKey = configText.match(/["']([a-zA-Z0-9]+)["']\s*:\s*["']([a-zA-Z0-9]+)["']/);
-    let drm = {};
-    if(drmKey) drm[drmKey[1]] = drmKey[2];
-
-    const logo = html.match(/const CHANNEL_LOGO = ["']([^"']+)["']/)?.[1] || "";
-
-    document.title = name;
-    document.getElementById("channelName").innerText = name;
-    document.getElementById("channelLogo").src = logo;
-    document.getElementById("status").style.display = "none";
-
-    startPlayer({mpd, token, drm});
-  }catch(err){
-    console.error(err);
-    document.getElementById("status").innerHTML = "❌ Failed to load stream";
+    try {
+      // Use CORS proxy to fetch config from allinonereborn (same as play1.html logic)
+      const targetUrl = `https://allinonereborn.online/tplay/play.php?id=${channelId}`;
+      const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
+      const resp = await fetch(proxyUrl);
+      const htmlText = await resp.text();
+      
+      // Extract streamConfig object from script
+      const configMatch = htmlText.match(/const streamConfig\s*=\s*(\{[\s\S]*?\});/);
+      if (!configMatch) throw new Error("Stream config not found in page");
+      const configText = configMatch[1];
+      
+      // parse fields exactly like play1 extractor
+      const nameMatch = configText.match(/name:\s*["']([^"']+)["']/);
+      const mpdMatch = configText.match(/mpd:\s*["']([^"']+)["']/);
+      const tokenMatch = configText.match(/token:\s*["']([^"']+)["']/);
+      const drmMatch = configText.match(/["']([a-fA-F0-9]{32})["']\s*:\s*["']([a-fA-F0-9]{32})["']/);
+      const logoMatch = htmlText.match(/const CHANNEL_LOGO\s*=\s*["']([^"']+)["']/);
+      const refererMatch = configText.match(/referer:\s*["']([^"']+)["']/);
+      const userAgentMatch = configText.match(/userAgent:\s*["']([^"']+)["']/);
+      
+      const channelName = nameMatch ? nameMatch[1] : "Channel";
+      const mpd = mpdMatch ? mpdMatch[1] : "";
+      const token = tokenMatch ? tokenMatch[1] : "";
+      let drm = {};
+      if (drmMatch) drm[drmMatch[1]] = drmMatch[2];
+      const channelLogo = logoMatch ? logoMatch[1] : getLogo(channelId, "https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/imageContent-6895-j6vqhqnc-v2/imageContent-6895-j6vqhqnc-m2.png");
+      const referer = refererMatch ? refererMatch[1] : "https://www.tataplaybinge.com/";
+      const userAgent = userAgentMatch ? userAgentMatch[1] : "Mozilla/5.0 (Linux; Android 13; SM-S918B) AppleWebKit/537.36 Chrome/124.0.0.0 Mobile Safari/537.36";
+      
+      // Update UI
+      document.title = `${channelName} | TP Binge`;
+      document.getElementById('channelName').innerText = channelName;
+      document.getElementById('channelLogo').src = channelLogo;
+      document.getElementById('channelGenre').innerText = "Live TV • Tata Play";
+      
+      // Update favorite button state
+      updateFavoriteButtonUI(channelId);
+      
+      // Save to recently watched
+      addToRecentlyWatched(channelId, channelName, channelLogo);
+      renderRecentlyWatched();
+      
+      // Initialize Shaka Player or reinit
+      initShakaPlayer(mpd, token, drm, referer, userAgent);
+      
+      // After loading, try to play in case autoplay blocked
+      setTimeout(() => { const vid = document.getElementById('video'); if(vid) vid.play().catch(e=>console.log("play",e)); }, 500);
+      
+    } catch (err) {
+      console.error("fetch error:", err);
+      showToast("Failed to load channel stream. Check ID or network.");
+    }
   }
-}
-
-async function startPlayer(config){
-  shaka.polyfill.installAll();
   
-  if(!shaka.Player.isBrowserSupported()){
-    alert("Browser not supported");
-    return;
-  }
-
-  const video = document.getElementById("video");
-  const container = document.querySelector(".player-container");
-  const player = new shaka.Player(video);
-
-  // MOBILE-OPTIMIZED UI CONFIG
-  const ui = new shaka.ui.Overlay(player, container, video);
-  
-  ui.configure({
-    controlPanelElements: [
-      'play_pause',
-      'mute',
-      'volume',
-      'time_and_duration',
-      'seek_bar',
-      'spacer',
-      'fullscreen'
-    ],
-    seekBarColors: {
-      base: 'rgba(255,255,255,0.3)',
-      buffered: 'rgba(255,255,255,0.5)',
-      played: '#fff'
-    },
-    fadeAfter: 4000, // Longer fade on mobile
-    showOnLoadStart: true,
-    doubleClickForFullscreen: true
-  });
-
-  // FORCE MOBILE CONTROLS VISIBLE
-  player.addEventListener('loaded', () => {
-    setTimeout(() => {
-      const controls = container.querySelectorAll('.shaka-controls-container, .shaka-mobile-controls-container');
-      controls.forEach(el => {
-        el.style.opacity = '1';
-        el.style.visibility = 'visible';
-        el.style.display = 'flex';
-      });
-    }, 500);
-  });
-
-  // DRM
-  player.configure({drm: {clearKeys: config.drm}});
-
-  // TOKEN
-  player.getNetworkingEngine().registerRequestFilter((type, request) => {
-    if((type === shaka.net.NetworkingEngine.RequestType.MANIFEST || 
-        type === shaka.net.NetworkingEngine.RequestType.SEGMENT) && config.token){
-      if(!request.uris[0].includes("__hdnea")){
-        const sep = request.uris[0].includes("?") ? "&" : "?";
-        request.uris[0] += sep + config.token;
+  // Shaka initialization (based on play.txt but dynamic DRM/token)
+  function initShakaPlayer(mpdUrl, token, drmKeys, referer, userAgent) {
+    const videoEl = document.getElementById('video');
+    const container = document.querySelector('[data-shaka-player-container]');
+    
+    if (shakaPlayer) {
+      shakaPlayer.destroy();
+      shakaPlayer = null;
+    }
+    shaka.polyfill.installAll();
+    if (!shaka.Player.isBrowserSupported()) {
+      alert("Browser not supported");
+      return;
+    }
+    shakaPlayer = new shaka.Player(videoEl);
+    // UI overlay
+    if (uiOverlay) uiOverlay.destroy();
+    uiOverlay = new shaka.ui.Overlay(shakaPlayer, container, videoEl);
+    uiOverlay.configure({
+      controlPanelElements: ['play_pause', 'time_and_duration', 'spacer', 'mute', 'fullscreen', 'quality', 'overflow_menu'],
+      overflowMenuButtons: ['captions', 'playback_rate'],
+      seekBarColors: { base: 'rgba(255,255,255,0.2)', buffered: 'rgba(255,255,255,0.4)', played: '#e8534a' }
+    });
+    
+    // DRM config
+    if (drmKeys && Object.keys(drmKeys).length) {
+      shakaPlayer.configure({ drm: { clearKeys: drmKeys } });
+    }
+    // Networking filter for token and headers
+    shakaPlayer.getNetworkingEngine().clearAllRequestFilters();
+    shakaPlayer.getNetworkingEngine().registerRequestFilter((type, request) => {
+      if (referer) request.headers['Referer'] = referer;
+      if (userAgent) request.headers['User-Agent'] = userAgent;
+      if (token && (type === shaka.net.NetworkingEngine.RequestType.MANIFEST || type === shaka.net.NetworkingEngine.RequestType.SEGMENT)) {
+        if (!request.uris[0].includes('__hdnea')) {
+          const separator = request.uris[0].includes('?') ? '&' : '?';
+          request.uris[0] += separator + token;
+        }
       }
+    });
+    
+    shakaPlayer.load(mpdUrl).then(() => {
+      console.log("Stream loaded:", mpdUrl);
+      showToast("Stream ready");
+    }).catch(e => { console.error(e); showToast("Playback error, try again"); });
+  }
+  
+  // Favorites management
+  function updateFavoriteButtonUI(channelId) {
+    const isFav = favorites.includes(channelId);
+    const favIcon = document.getElementById('favIcon');
+    const favText = document.getElementById('favText');
+    if (isFav) {
+      favIcon.innerText = 'favorite';
+      favText.innerText = 'Favorited';
+      document.getElementById('favBtn').classList.add('fav-active');
+    } else {
+      favIcon.innerText = 'favorite_border';
+      favText.innerText = 'Favorite';
+      document.getElementById('favBtn').classList.remove('fav-active');
+    }
+  }
+  
+  function toggleFavorite() {
+    if (!currentChannelId) return;
+    const idx = favorites.indexOf(currentChannelId);
+    if (idx === -1) {
+      favorites.push(currentChannelId);
+      showToast("Added to favorites");
+    } else {
+      favorites.splice(idx, 1);
+      showToast("Removed from favorites");
+    }
+    saveFavorites();
+    updateFavoriteButtonUI(currentChannelId);
+    renderSimilarChannels(); // refresh favorite icons in suggestions
+  }
+  
+  function addToRecentlyWatched(id, name, logo) {
+    recents = recents.filter(cid => cid !== id);
+    recents.unshift(id);
+    if (recents.length > 15) recents.pop();
+    saveRecents();
+  }
+  
+  function renderRecentlyWatched() {
+    const container = document.getElementById('recentlyWatchedList');
+    if (!container) return;
+    const recentIds = recents.filter(rid => rid != currentChannelId);
+    if (recentIds.length === 0) {
+      container.innerHTML = '<div class="empty-state">No recently watched channels</div>';
+      return;
+    }
+    let html = '';
+    for (let rid of recentIds.slice(0, 12)) {
+      const ch = CHANNELS_DB.find(c => c.id == rid);
+      if (!ch) continue;
+      html += `
+        <div class="channel-item" onclick="navigateToChannel('${ch.id}')">
+          <div class="channel-icon"><img src="${ch.logo}" loading="lazy" onerror="this.src='https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/imageContent-6895-j6vqhqnc-v2/imageContent-6895-j6vqhqnc-m2.png'"></div>
+          <span class="channel-title-sm">${ch.name}</span>
+        </div>
+      `;
+    }
+    container.innerHTML = html;
+  }
+  
+  function renderSimilarChannels() {
+    const container = document.getElementById('similarChannelsList');
+    if (!container) return;
+    // Show top 6 channels from DB excluding current
+    let similar = CHANNELS_DB.filter(c => c.id != currentChannelId);
+    if (similar.length === 0) {
+      container.innerHTML = '<div class="empty-state">No recommendations</div>';
+      return;
+    }
+    let html = '';
+    for (let ch of similar.slice(0, 8)) {
+      const isFav = favorites.includes(ch.id);
+      html += `
+        <div class="channel-item" onclick="navigateToChannel('${ch.id}')">
+          <div class="channel-icon">
+            <img src="${ch.logo}" onerror="this.src='https://ltsk-cdn.s3.eu-west-1.amazonaws.com/jumpstart/Temp_Live/cdn/HLS/Channel/imageContent-6895-j6vqhqnc-v2/imageContent-6895-j6vqhqnc-m2.png'">
+            <div class="heart-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavoriteById('${ch.id}')">
+              <span class="material-icons-round">${isFav ? 'favorite' : 'favorite_border'}</span>
+            </div>
+          </div>
+          <span class="channel-title-sm">${ch.name}</span>
+        </div>
+      `;
+    }
+    container.innerHTML = html;
+  }
+  
+  // Helper: toggle favorite by ID for channel cards
+  function toggleFavoriteById(chId) {
+    const idx = favorites.indexOf(chId);
+    if (idx === -1) favorites.push(chId);
+    else favorites.splice(idx, 1);
+    saveFavorites();
+    renderSimilarChannels();
+    if (currentChannelId === chId) updateFavoriteButtonUI(chId);
+    showToast(idx === -1 ? "Added to favorites" : "Removed from favorites");
+  }
+  
+  function navigateToChannel(chId) {
+    if (chId == currentChannelId) return;
+    // Reload player with new channel
+    fetchAndPlayChannel(chId);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  
+  window.navigateToChannel = navigateToChannel;
+  window.toggleFavoriteById = toggleFavoriteById;
+  document.getElementById('favBtn')?.addEventListener('click', toggleFavorite);
+  
+  // EPG mock progress (for visual consistency)
+  function updateProgress() {
+    const now = new Date();
+    const startHour = 6, endHour = 24; // mock day progress
+    const start = new Date(); start.setHours(startHour,0,0,0);
+    let end = new Date(); end.setHours(endHour,0,0,0);
+    if(now < start) document.getElementById('epgProgress').style.width = '0%';
+    else if(now > end) document.getElementById('epgProgress').style.width = '100%';
+    else {
+      const total = end - start;
+      const elapsed = now - start;
+      const pct = (elapsed/total)*100;
+      document.getElementById('epgProgress').style.width = pct + '%';
+    }
+    // update mock time
+    const progTimeSpan = document.getElementById('programTime');
+    if(progTimeSpan) progTimeSpan.innerText = `${startHour.toString().padStart(2,'0')}:00 → ${endHour.toString().padStart(2,'0')}:00`;
+    const progTitleSpan = document.getElementById('programTitle');
+    if(progTitleSpan && progTitleSpan.innerText === 'Currently Airing') progTitleSpan.innerText = 'Prime Time Entertainments';
+  }
+  setInterval(updateProgress, 5000);
+  updateProgress();
+  
+  // Description toggle
+  window.toggleDesc = function() {
+    const short = document.getElementById('shortDesc');
+    const full = document.getElementById('fullDesc');
+    const btn = document.querySelector('.desc-toggle');
+    if(short.classList.contains('hide')) {
+      short.classList.remove('hide');
+      full.classList.remove('show');
+      btn.textContent = 'More info';
+    } else {
+      short.classList.add('hide');
+      full.classList.add('show');
+      btn.textContent = 'Show less';
+    }
+  };
+  
+  // Autoplay robust handling
+  function ensurePlay() {
+    const video = document.getElementById('video');
+    if(video && video.paused) { video.play().catch(e=>console.log('autoplay blocked')); }
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    // get channel id from URL param "id"
+    const urlParams = new URLSearchParams(window.location.search);
+    let channelId = urlParams.get('id');
+    if (!channelId) channelId = "244"; // default Star Bharat HD
+    fetchAndPlayChannel(channelId);
+    renderRecentlyWatched();
+    renderSimilarChannels();
+    // additional touch events for audio unmute but keep muted initially
+    const videoEl = document.getElementById('video');
+    if(videoEl) {
+      videoEl.muted = true;
+      document.body.addEventListener('touchstart', () => { if(videoEl.muted) videoEl.muted = false; videoEl.play().catch(()=>{}); }, { once: true });
     }
   });
-
-  try{
-    await player.load(config.mpd);
-    await video.play();
-  }catch(err){
-    console.error(err);
-    document.getElementById("status").style.display = "block";
-    document.getElementById("status").innerHTML = "❌ Stream failed";
-  }
-}
-
-if(id) getConfig();
-else document.getElementById("status").innerHTML = "No Channel ID";
+  
+  window.addEventListener('load', () => { setTimeout(() => ensurePlay(), 1000); });
 </script>
 
 </body>
