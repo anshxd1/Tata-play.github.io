@@ -7,26 +7,39 @@
 
 <meta
 name="viewport"
-content="width=device-width, initial-scale=1, viewport-fit=cover">
+content="width=device-width,
+initial-scale=1,
+maximum-scale=1,
+viewport-fit=cover,
+user-scalable=no">
 
 <title id="title">Tata Play</title>
 
-<link
-rel="stylesheet"
+<link rel="stylesheet"
 href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js"></script>
 
 <style>
 
+/* =========================
+ROOT
+========================= */
+
 :root{
   --header-height:64px;
-  --bg:#000;
-  --text:#fff;
-  --card:#111827;
-  --border:rgba(255,255,255,.08);
+  --bg-body:#0d0d18;
+  --bg-card:#13131f;
+  --border:rgba(255,255,255,.07);
+  --text:#f0f0f5;
+  --text2:#8888aa;
   --accent:#e8534a;
+  --radius:16px;
 }
+
+/* =========================
+RESET
+========================= */
 
 *{
   margin:0;
@@ -34,14 +47,16 @@ href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.cs
   box-sizing:border-box;
 }
 
-html,
-body{
-  width:100%;
-  height:100%;
-  background:#000;
-  overflow:hidden;
+html{
+  background:var(--bg-body);
+  color:var(--text);
+  overflow-x:hidden;
   font-family:sans-serif;
-  color:#fff;
+}
+
+body{
+  background:var(--bg-body);
+  min-height:100vh;
 }
 
 /* =========================
@@ -49,12 +64,11 @@ HEADER
 ========================= */
 
 .app-header{
-  position:fixed;
+  position:sticky;
   top:0;
-  left:0;
-  width:100%;
-  height:var(--header-height);
   z-index:99999;
+
+  height:var(--header-height);
 
   display:flex;
   align-items:center;
@@ -62,10 +76,10 @@ HEADER
 
   padding:0 16px;
 
-  background:rgba(0,0,0,.72);
+  background:rgba(13,13,24,.92);
 
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
 
   border-bottom:1px solid var(--border);
 }
@@ -74,33 +88,39 @@ HEADER
   width:40px;
   height:40px;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
   border-radius:50%;
 
-  background:rgba(255,255,255,.08);
+  background:#1a1a2e;
+
+  border:1px solid var(--border);
 
   color:#fff;
 
   text-decoration:none;
 
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
   font-size:20px;
 }
 
-.channel-meta{
+.channel-wrap{
   display:flex;
   align-items:center;
   gap:12px;
+
   min-width:0;
 }
 
 .channel-logo{
   width:42px;
   height:42px;
+
   border-radius:50%;
+
   object-fit:cover;
+
   background:#fff;
 }
 
@@ -119,7 +139,7 @@ HEADER
 
 .channel-text p{
   font-size:12px;
-  color:#aaa;
+  color:var(--text2);
   margin-top:2px;
 }
 
@@ -128,13 +148,9 @@ PLAYER AREA
 ========================= */
 
 .player-area{
-  position:relative;
   width:100%;
-  height:100vh;
   background:#000;
-  overflow:hidden;
-
-  padding-top:var(--header-height);
+  position:relative;
 }
 
 /* =========================
@@ -142,14 +158,25 @@ VIDEO CONTAINER
 ========================= */
 
 .video-container{
-  position:relative;
-
   width:100%;
-  height:calc(100vh - var(--header-height));
+  aspect-ratio:16/9;
 
   background:#000;
 
+  position:relative;
+
   overflow:hidden;
+}
+
+/* =========================
+VIDEO
+========================= */
+
+.video-container video{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  background:#000;
 }
 
 /* =========================
@@ -159,25 +186,17 @@ SHAKA
 .shaka-video-container{
   width:100% !important;
   height:100% !important;
-  background:#000 !important;
-}
 
-video{
-  width:100% !important;
-  height:100% !important;
-
-  object-fit:cover !important;
+  overflow:hidden !important;
 
   background:#000 !important;
 }
-
-/* =========================
-CONTROLS
-========================= */
 
 .shaka-controls-container{
   z-index:999999 !important;
-  padding-bottom:env(safe-area-inset-bottom) !important;
+
+  padding-bottom:
+  env(safe-area-inset-bottom) !important;
 }
 
 .shaka-bottom-controls{
@@ -195,11 +214,13 @@ STATUS
 
 #status{
   position:absolute;
+
   top:50%;
   left:50%;
+
   transform:translate(-50%,-50%);
 
-  z-index:999999;
+  z-index:99999;
 
   background:rgba(0,0,0,.82);
 
@@ -209,9 +230,56 @@ STATUS
 
   font-size:14px;
 
-  backdrop-filter:blur(10px);
-
   border:1px solid rgba(255,255,255,.08);
+
+  backdrop-filter:blur(10px);
+}
+
+/* =========================
+MOBILE FIX
+========================= */
+
+@media (max-width:768px){
+
+  html,
+  body{
+    background:#000;
+  }
+
+  .player-area{
+    width:100%;
+    height:100vh;
+    overflow:hidden;
+  }
+
+  .video-container{
+
+    width:100% !important;
+
+    height:calc(100vh - 64px) !important;
+
+    aspect-ratio:auto !important;
+
+  }
+
+  .shaka-video-container{
+
+    width:100% !important;
+    height:100% !important;
+
+  }
+
+  video{
+
+    width:100% !important;
+    height:100% !important;
+
+    object-fit:contain !important;
+
+    background:#000;
+
+  }
+
 }
 
 </style>
@@ -230,7 +298,7 @@ STATUS
 ←
 </a>
 
-<div class="channel-meta">
+<div class="channel-wrap">
 
 <img
 id="channelLogo"
@@ -281,7 +349,7 @@ Connecting...
 <script>
 
 /* =========================
-GET CHANNEL ID
+CONFIG
 ========================= */
 
 const id =
@@ -322,6 +390,14 @@ throw new Error(
 
 const html =
 await res.text();
+
+if(html.includes("Access denied")){
+
+throw new Error(
+"Proxy blocked request"
+);
+
+}
 
 /* =========================
 EXTRACT CONFIG
@@ -448,7 +524,7 @@ document.getElementById("status")
 .style.display = "none";
 
 /* =========================
-INIT PLAYER
+START PLAYER
 ========================= */
 
 initPlayer(streamConfig);
@@ -478,7 +554,9 @@ shaka.polyfill.installAll();
 
 if(!shaka.Player.isBrowserSupported()){
 
-alert("Browser not supported");
+alert(
+"Browser not supported"
+);
 
 return;
 
@@ -487,13 +565,13 @@ return;
 const video =
 document.getElementById("video");
 
-const container =
+const videoContainer =
 document.querySelector(
 "[data-shaka-player-container]"
 );
 
 /* =========================
-REMOVE INLINE STYLES
+REMOVE INLINE SIZE
 ========================= */
 
 video.removeAttribute("style");
@@ -508,7 +586,7 @@ new shaka.Player(video);
 const ui =
 new shaka.ui.Overlay(
 shakaPlayer,
-container,
+videoContainer,
 video
 );
 
@@ -586,17 +664,20 @@ config.userAgent;
 
 if(
 (type ===
-shaka.net.NetworkingEngine.RequestType.MANIFEST
+shaka.net.NetworkingEngine
+.RequestType.MANIFEST
 ||
 type ===
-shaka.net.NetworkingEngine.RequestType.SEGMENT)
+shaka.net.NetworkingEngine
+.RequestType.SEGMENT)
 &&
 !request.uris[0]
 .includes('__hdnea')
 ){
 
 const sep =
-request.uris[0].includes('?')
+request.uris[0]
+.includes('?')
 ?
 '&'
 :
@@ -688,6 +769,8 @@ document.addEventListener(
 const video =
 document.getElementById("video");
 
+if(video){
+
 const forcePlay =
 async()=>{
 
@@ -708,7 +791,8 @@ forcePlay,
 1200
 );
 
-document.body.addEventListener(
+document.body
+.addEventListener(
 "touchstart",
 ()=>{
 
@@ -719,7 +803,8 @@ forcePlay();
 );
 
 }
-);
+
+});
 
 /* =========================
 START
