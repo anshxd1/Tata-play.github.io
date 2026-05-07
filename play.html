@@ -12,11 +12,11 @@
     .player-area { position:fixed; top:0; left:0; width:100vw; height:100dvh; }
     .header {
       position: absolute; top: 15px; left: 15px; z-index: 10000;
-      background: rgba(0,0,0,0.75); padding: 10px 15px; border-radius: 10px;
-      display: flex; align-items: center; gap: 12px; backdrop-filter: blur(10px);
+      background: rgba(0,0,0,0.8); padding: 12px 16px; border-radius: 12px;
+      display: flex; align-items: center; gap: 12px; backdrop-filter: blur(12px);
     }
-    .back-btn { font-size: 28px; color: white; text-decoration: none; }
-    .error { color: #ff6b6b; text-align: center; padding: 20px; }
+    .back-btn { font-size: 30px; color: white; text-decoration: none; }
+    .loading { text-align:center; margin-top: 40vh; font-size: 18px; }
   </style>
 </head>
 <body>
@@ -26,7 +26,7 @@
     <a href="index.html" class="back-btn">←</a>
     <div>
       <strong id="chName">Loading Channel...</strong><br>
-      <small id="chInfo">Tata Play</small>
+      <small id="chInfo">Please wait</small>
     </div>
   </div>
 
@@ -36,46 +36,54 @@
 </div>
 
 <script>
-// Free public CORS proxy (allorigins.win)
+// CORS Proxy
 const CORS_PROXY = "https://api.allorigins.win/raw?url=";
 
 const params = new URLSearchParams(location.search);
 const id = params.get('id');
 
 if (!id) {
-  document.body.innerHTML = `<h2 class="error">❌ Channel ID missing</h2>`;
+  document.body.innerHTML = `<h2 style="color:red;text-align:center;margin-top:100px">Channel ID missing</h2>`;
 }
 
 async function fetchStreamConfig() {
   try {
+    document.getElementById('chName').textContent = "Fetching stream...";
+    
     const targetUrl = `https://allinonereborn.online/tplay/play.php?id=${id}`;
     const response = await fetch(CORS_PROXY + encodeURIComponent(targetUrl));
-    
-    if (!response.ok) throw new Error("Failed to fetch");
-
     const html = await response.text();
 
-    // Extract streamConfig
-    const match = html.match(/const streamConfig\s*=\s*(\{[\s\S]*?\});/);
+    // Better regex to extract streamConfig
+    let match = html.match(/const streamConfig\s*=\s*(\{[\s\S]*?\});/);
     
-    if (!match) throw new Error("Config not found in response");
+    if (!match) {
+      match = html.match(/streamConfig\s*=\s*(\{[\s\S]*?\});/);
+    }
 
-    let configStr = match[1]
-      .replace(/(\w+):/g, '"$1":')           // keys ko quote karo
-      .replace(/'/g, '"');                   // single quotes ko double mein
+    if (!match) throw new Error("Stream config not found");
+
+    let configStr = match[1];
+
+    // Advanced cleaning for JS object → JSON
+    configStr = configStr
+      .replace(/(\w+):/g, '"$1":')           // unquoted keys
+      .replace(/'/g, '"')                    // single to double quotes
+      .replace(/,\s*}/g, '}')                // trailing commas
+      .replace(/,\s*([\]}])/g, '$1');        // more trailing comma fixes
 
     const streamConfig = JSON.parse(configStr);
 
-    // UI Update
+    // Update UI
     document.getElementById('chName').textContent = streamConfig.name || `Channel ${id}`;
-    document.getElementById('title').textContent = `${streamConfig.name || 'Live'} — Tata Play`;
-    document.getElementById('chInfo').textContent = "HD Live";
+    document.getElementById('title').textContent = (streamConfig.name || 'Live TV') + " — Tata Play";
+    document.getElementById('chInfo').textContent = "HD • Live";
 
     initShakaPlayer(streamConfig);
 
   } catch (err) {
     console.error(err);
-    document.getElementById('chName').innerHTML = `❌ Error loading channel<br><small>${err.message}</small>`;
+    document.getElementById('chName').innerHTML = `❌ Failed to load<br><small>${err.message}</small>`;
   }
 }
 
@@ -89,28 +97,29 @@ function initShakaPlayer(config) {
 
   player.configure({
     drm: { clearKeys: config.drm || {} },
-    streaming: { bufferingGoal: 30 }
+    streaming: { bufferingGoal: 30, rebufferingGoal: 15 }
   });
 
   player.getNetworkingEngine().registerRequestFilter((type, request) => {
     if (config.referer) request.headers['Referer'] = config.referer;
     if (config.userAgent) request.headers['User-Agent'] = config.userAgent;
 
-    if (request.uris[0].includes('manifest.mpd') || request.uris[0].includes('/output/')) {
-      const sep = request.uris[0].includes('?') ? '&' : '?';
-      request.uris[0] += sep + (config.token || '');
+    const url = request.uris[0];
+    if (url.includes('manifest.mpd') || url.includes('/output/')) {
+      const sep = url.includes('?') ? '&' : '?';
+      request.uris[0] = url + sep + (config.token || '');
     }
   });
 
   player.load(config.mpd)
-    .then(() => console.log("✅ Stream Loaded Successfully"))
+    .then(() => console.log("✅ Stream Loaded"))
     .catch(e => {
-      console.error(e);
-      alert("Stream load failed. Token might be expired.");
+      console.error("Load Error:", e);
+      alert("Cannot play stream. Token may have expired.");
     });
 }
 
-// Start
+// Start Loading
 fetchStreamConfig();
 </script>
 </body>
