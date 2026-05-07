@@ -61,7 +61,7 @@ async function loadChannel(){
 
 try{
 
-const res = await fetch("https://allinonereborn.online/tplay/channels.json");
+const response = await fetch('./channels.json?nocache=' + Date.now());
 const channels = await res.json();
 
 const channel = channels.find(c => String(c.id) === String(channelId));
