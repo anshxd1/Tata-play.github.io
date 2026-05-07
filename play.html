@@ -14,10 +14,18 @@ user-scalable=no">
 
 <title id="title">Tata Play</title>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+rel="stylesheet">
+
 <link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css">
+href="https://fonts.googleapis.com/icon?family=Material+Icons+Round">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js"></script>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css">
 
 
 <style>
@@ -885,24 +893,22 @@ PREVENT UI OVERFLOW
 
 <!-- HEADER -->
 
-<header class="app-header">
+<header class="app-header" id="header">
+
+<div class="header-left">
 
 <a href="index.html" class="back-btn">
-←
+
+<span class="material-icons-round">
+arrow_back
+</span>
+
 </a>
 
-<div style="display:flex;align-items:center;gap:12px;">
-
-<img
-id="channelLogo"
-class="channel-logo"
-src=""
-alt="logo">
-
-<div class="channel-text">
+<div class="channel-meta">
 
 <h1 id="chName">
-Loading...
+Loading Channel...
 </h1>
 
 <p id="chInfo">
@@ -913,9 +919,26 @@ Tata Play
 
 </div>
 
+<div class="live-badge">
+
+<div class="live-dot"></div>
+
+LIVE
+
+</div>
+
 </header>
 
-<!-- VIDEO -->
+<!-- STATUS -->
+
+<div class="status"
+id="status">
+
+Connecting...
+
+</div>
+
+<!-- VIDEO PLAYER -->
 
 <div
 class="video-container"
@@ -924,38 +947,16 @@ data-shaka-player-container>
 <video
 id="video"
 autoplay
-muted
 playsinline
-webkit-playsinline>
+webkit-playsinline
+muted>
 </video>
 
-</div>
-
-<!-- STATUS -->
-
-<div
-id="status"
-style="
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-z-index:9999;
-background:rgba(0,0,0,.8);
-padding:14px 20px;
-border-radius:12px;
-font-family:sans-serif;
-">
-Connecting...
 </div>
 
 </div>
 
 <script>
-
-/* =========================================
-CONFIG
-========================================= */
 
 const CORS_PROXY =
 "https://corsproxy.io/?";
@@ -963,8 +964,6 @@ const CORS_PROXY =
 const id =
 new URLSearchParams(location.search)
 .get("id");
-
-let shakaPlayer = null;
 
 /* =========================================
 FETCH STREAM CONFIG
@@ -986,7 +985,7 @@ const html =
 await res.text();
 
 /* =========================================
-EXTRACT STREAMCONFIG
+EXTRACT CONFIG
 ========================================= */
 
 const configText =
@@ -1001,10 +1000,6 @@ throw new Error(
 );
 
 }
-
-/* =========================================
-EXTRACT VALUES
-========================================= */
 
 const name =
 configText.match(
@@ -1057,27 +1052,6 @@ drm[key[1]] = key[2];
 
 }
 
-/* =========================================
-LOGO
-========================================= */
-
-let logo = "";
-
-const logoMatch =
-html.match(
-/const CHANNEL_LOGO = ["']([^"']+)["']/
-);
-
-if(logoMatch){
-
-logo = logoMatch[1];
-
-}
-
-/* =========================================
-FINAL CONFIG
-========================================= */
-
 const streamConfig = {
 
 name,
@@ -1085,8 +1059,7 @@ mpd,
 token,
 referer,
 userAgent,
-drm,
-logo
+drm
 
 };
 
@@ -1096,7 +1069,7 @@ streamConfig
 );
 
 /* =========================================
-UPDATE UI
+UI UPDATE
 ========================================= */
 
 document.getElementById("chName")
@@ -1105,9 +1078,6 @@ document.getElementById("chName")
 document.getElementById("title")
 .textContent =
 streamConfig.name + " — Tata Play";
-
-document.getElementById("channelLogo")
-.src = streamConfig.logo;
 
 document.getElementById("status")
 .style.display = "none";
@@ -1124,7 +1094,7 @@ console.error(e);
 
 document.getElementById("status")
 .innerHTML =
-`❌ Failed to load`;
+`❌ Failed to load<br><small>${e.message}</small>`;
 
 }
 
@@ -1151,29 +1121,31 @@ return;
 const video =
 document.getElementById("video");
 
-const videoContainer =
+const container =
 document.querySelector(
 "[data-shaka-player-container]"
 );
 
 /* =========================================
-VERY IMPORTANT
-REMOVE INLINE VIDEO SIZE
+IMPORTANT VIDEO FIX
 ========================================= */
 
-video.removeAttribute("style");
+video.style.width = "100%";
+video.style.height = "100%";
+video.style.objectFit = "contain";
+video.style.background = "#000";
 
 /* =========================================
 CREATE PLAYER
 ========================================= */
 
-shakaPlayer =
+const player =
 new shaka.Player(video);
 
 const ui =
 new shaka.ui.Overlay(
-shakaPlayer,
-videoContainer,
+player,
+container,
 video
 );
 
@@ -1189,6 +1161,7 @@ controlPanelElements:[
 'time_and_duration',
 'spacer',
 'mute',
+'volume',
 'fullscreen',
 'overflow_menu'
 
@@ -1208,22 +1181,15 @@ overflowMenuButtons:[
 PLAYER CONFIG
 ========================================= */
 
-shakaPlayer.configure({
+player.configure({
 
 drm:{
-clearKeys: config.drm
+clearKeys: config.drm || {}
 },
 
 streaming:{
-
 bufferingGoal:30,
-
-rebufferingGoal:15,
-
-retryParameters:{
-maxAttempts:5
-}
-
+rebufferingGoal:15
 }
 
 });
@@ -1232,44 +1198,44 @@ maxAttempts:5
 REQUEST FILTER
 ========================================= */
 
-shakaPlayer
-.getNetworkingEngine()
-.clearAllRequestFilters();
-
-shakaPlayer
-.getNetworkingEngine()
+player.getNetworkingEngine()
 .registerRequestFilter(
 (type,request)=>{
+
+if(config.referer){
 
 request.headers['Referer'] =
 config.referer;
 
+}
+
+if(config.userAgent){
+
 request.headers['User-Agent'] =
 config.userAgent;
 
+}
+
+const url =
+request.uris[0];
+
 if(
-(type ===
-shaka.net.NetworkingEngine
-.RequestType.MANIFEST
+(url.includes("manifest.mpd")
 ||
-type ===
-shaka.net.NetworkingEngine
-.RequestType.SEGMENT)
+url.includes("/output/"))
 &&
-!request.uris[0]
-.includes('__hdnea')
+config.token
 ){
 
 const sep =
-request.uris[0]
-.includes('?')
+url.includes("?")
 ?
-'&'
+"&"
 :
-'?';
+"?";
 
-request.uris[0] +=
-sep + config.token;
+request.uris[0] =
+url + sep + config.token;
 
 }
 
@@ -1280,35 +1246,19 @@ sep + config.token;
 LOAD STREAM
 ========================================= */
 
-shakaPlayer.load(config.mpd)
+player.load(config.mpd)
 
 .then(async()=>{
 
 console.log(
-"✅ Stream loaded"
+"✅ Stream Started"
 );
 
 /* =========================================
-FORCE PLAY
+UNMUTE + PLAY
 ========================================= */
 
-video.muted = true;
-
-video.defaultMuted = true;
-
-video.autoplay = true;
-
-video.playsInline = true;
-
-video.setAttribute(
-"playsinline",
-""
-);
-
-video.setAttribute(
-"webkit-playsinline",
-""
-);
+video.muted = false;
 
 try{
 
@@ -1320,11 +1270,76 @@ console.log(e);
 
 }
 
+})
+
+.catch(err=>{
+
+console.error(err);
+
+alert(
+"Stream failed.\nToken expired."
+);
+
+});
+
+}
+
 /* =========================================
-UNMUTE AFTER START
+AUTO HEADER HIDE
 ========================================= */
 
+let hideTimer;
+
+function showHeader(){
+
+const header =
+document.getElementById("header");
+
+header.style.opacity = "1";
+
+clearTimeout(hideTimer);
+
+hideTimer =
 setTimeout(()=>{
+
+header.style.opacity = "0";
+
+},4000);
+
+}
+
+document.addEventListener(
+"mousemove",
+showHeader
+);
+
+document.addEventListener(
+"touchstart",
+showHeader
+);
+
+showHeader();
+
+/* =========================================
+START
+========================================= */
+
+if(id){
+
+fetchStreamConfig();
+
+}else{
+
+document.getElementById("status")
+.textContent =
+"No Channel ID";
+
+}
+
+</script>
+
+</body>
+</html>imeout(()=>{
 
 video.muted = false;
 
