@@ -301,12 +301,24 @@ try{
 const target =
 `https://allinonereborn.online/tplay/play.php?id=${id}`;
 
+const proxy =
+"https://corsproxy.io/?";
+
 const res =
-await fetch(target,{
-headers:{
-"User-Agent":navigator.userAgent
+await fetch(
+proxy + encodeURIComponent(target),
+{
+cache:"no-cache"
 }
-});
+);
+
+if(!res.ok){
+
+throw new Error(
+"Failed to fetch stream config"
+);
+
+}
 
 const html =
 await res.text();
