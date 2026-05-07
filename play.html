@@ -33,8 +33,6 @@ ROOT
   --border:rgba(255,255,255,.07);
   --text:#f0f0f5;
   --text2:#8888aa;
-  --accent:#e8534a;
-  --radius:16px;
 }
 
 /* =========================
@@ -81,7 +79,7 @@ HEADER
   backdrop-filter:blur(20px);
   -webkit-backdrop-filter:blur(20px);
 
-  border-bottom:1px solid var(--border);
+  border-bottom:1px solid rgba(255,255,255,.08);
 }
 
 .back-btn{
@@ -92,7 +90,7 @@ HEADER
 
   background:#1a1a2e;
 
-  border:1px solid var(--border);
+  border:1px solid rgba(255,255,255,.08);
 
   color:#fff;
 
@@ -109,18 +107,14 @@ HEADER
   display:flex;
   align-items:center;
   gap:12px;
-
   min-width:0;
 }
 
 .channel-logo{
   width:42px;
   height:42px;
-
   border-radius:50%;
-
   object-fit:cover;
-
   background:#fff;
 }
 
@@ -149,9 +143,10 @@ PLAYER AREA
 
 .player-area{
   width:100%;
-  min-height:100vh;
-  overflow:visible;
+  background:#000;
+  position:relative;
 }
+
 /* =========================
 VIDEO CONTAINER
 ========================= */
@@ -178,7 +173,67 @@ VIDEO
   background:#000;
 }
 
+/* =========================
+SHAKA
+========================= */
 
+.shaka-video-container{
+  width:100% !important;
+  height:100% !important;
+  background:#000 !important;
+}
+
+.shaka-controls-container{
+  z-index:999999 !important;
+  padding-bottom:env(safe-area-inset-bottom) !important;
+}
+
+.shaka-bottom-controls{
+  width:100% !important;
+  box-sizing:border-box !important;
+}
+
+.shaka-overflow-menu{
+  max-height:70vh !important;
+}
+
+/* =========================
+FORCE MOBILE CONTROLS
+========================= */
+
+.shaka-controls-container{
+  opacity:1 !important;
+  visibility:visible !important;
+  display:flex !important;
+}
+
+.shaka-bottom-controls{
+  opacity:1 !important;
+  visibility:visible !important;
+  display:flex !important;
+}
+
+.shaka-seek-bar-container{
+  display:block !important;
+  opacity:1 !important;
+  visibility:visible !important;
+}
+
+.shaka-fullscreen-button{
+  display:flex !important;
+}
+
+.shaka-overflow-menu-button{
+  display:flex !important;
+}
+
+.shaka-time-duration-container{
+  display:flex !important;
+}
+
+.shaka-small-play-button{
+  display:none !important;
+}
 
 /* =========================
 STATUS
@@ -208,7 +263,7 @@ STATUS
 }
 
 /* =========================
-MOBILE FIX
+MOBILE
 ========================= */
 
 @media (max-width:768px){
@@ -220,8 +275,8 @@ MOBILE FIX
 
   .player-area{
     width:100%;
-    height:100vh;
-    overflow:hidden;
+    min-height:100vh;
+    overflow:visible;
   }
 
   .video-container{
@@ -235,56 +290,18 @@ MOBILE FIX
   }
 
   .shaka-video-container{
-
     width:100% !important;
     height:100% !important;
-
   }
 
   video{
-
     width:100% !important;
     height:100% !important;
 
     object-fit:contain !important;
 
     background:#000;
-
   }
-  /* =========================
-SHAKA MOBILE CONTROLS FIX
-========================= */
-
-.shaka-controls-container{
-  opacity:1 !important;
-  display:flex !important;
-  visibility:visible !important;
-}
-
-.shaka-bottom-controls{
-  display:flex !important;
-  opacity:1 !important;
-  visibility:visible !important;
-}
-
-.shaka-seek-bar-container{
-  display:flex !important;
-  opacity:1 !important;
-  visibility:visible !important;
-}
-
-.shaka-fullscreen-button{
-  display:flex !important;
-}
-
-.shaka-overflow-menu-button{
-  display:flex !important;
-}
-
-.shaka-current-time,
-.shaka-time-duration{
-  display:block !important;
-}
 
 }
 
@@ -295,8 +312,6 @@ SHAKA MOBILE CONTROLS FIX
 <body>
 
 <div class="player-area">
-
-<!-- HEADER -->
 
 <header class="app-header">
 
@@ -328,8 +343,6 @@ Tata Play
 
 </header>
 
-<!-- PLAYER -->
-
 <div
 class="video-container"
 data-shaka-player-container>
@@ -343,8 +356,6 @@ webkit-playsinline>
 </video>
 
 </div>
-
-<!-- STATUS -->
 
 <div id="status">
 Connecting...
@@ -365,7 +376,7 @@ new URLSearchParams(location.search)
 let shakaPlayer = null;
 
 /* =========================
-FETCH STREAM CONFIG
+FETCH CONFIG
 ========================= */
 
 async function fetchStreamConfig(){
@@ -397,16 +408,8 @@ throw new Error(
 const html =
 await res.text();
 
-if(html.includes("Access denied")){
-
-throw new Error(
-"Proxy blocked request"
-);
-
-}
-
 /* =========================
-EXTRACT CONFIG
+PARSE CONFIG
 ========================= */
 
 const configText =
@@ -422,10 +425,6 @@ throw new Error(
 
 }
 
-/* =========================
-VALUES
-========================= */
-
 const name =
 configText.match(
 /name:\s*["']([^"']+)["']/
@@ -440,20 +439,6 @@ const token =
 configText.match(
 /token:\s*["']([^"']+)["']/
 )?.[1] || "";
-
-const referer =
-configText.match(
-/referer:\s*["']([^"']+)["']/
-)?.[1] || "";
-
-const userAgent =
-configText.match(
-/userAgent:\s*["']([^"']+)["']/
-)?.[1] || navigator.userAgent;
-
-/* =========================
-DRM
-========================= */
 
 const drmMatch =
 configText.match(
@@ -477,10 +462,6 @@ drm[key[1]] = key[2];
 
 }
 
-/* =========================
-LOGO
-========================= */
-
 let logo = "";
 
 const logoMatch =
@@ -494,25 +475,15 @@ logo = logoMatch[1];
 
 }
 
-/* =========================
-FINAL CONFIG
-========================= */
-
 const streamConfig = {
 
 name,
 mpd,
 token,
-referer,
-userAgent,
 drm,
 logo
 
 };
-
-/* =========================
-UPDATE UI
-========================= */
 
 document.getElementById("title")
 .textContent =
@@ -528,10 +499,6 @@ streamConfig.logo;
 
 document.getElementById("status")
 .style.display = "none";
-
-/* =========================
-START PLAYER
-========================= */
 
 initPlayer(streamConfig);
 
@@ -571,19 +538,19 @@ return;
 const video =
 document.getElementById("video");
 
-const videoContainer =
+const container =
 document.querySelector(
 "[data-shaka-player-container]"
 );
 
-/* =========================
-REMOVE INLINE SIZE
-========================= */
-
 video.removeAttribute("style");
 
+video.controls = true;
+
+video.crossOrigin = "anonymous";
+
 /* =========================
-CREATE PLAYER
+PLAYER
 ========================= */
 
 shakaPlayer =
@@ -592,7 +559,7 @@ new shaka.Player(video);
 const ui =
 new shaka.ui.Overlay(
 shakaPlayer,
-videoContainer,
+container,
 video
 );
 
@@ -602,14 +569,22 @@ UI CONFIG
 
 ui.configure({
 
+addSeekBar:true,
+
 controlPanelElements:[
 
 'play_pause',
+
 'time_and_duration',
+
 'spacer',
+
 'mute',
+
 'volume',
+
 'fullscreen',
+
 'overflow_menu'
 
 ],
@@ -617,11 +592,16 @@ controlPanelElements:[
 overflowMenuButtons:[
 
 'quality',
+
 'language',
+
 'picture_in_picture',
+
 'playback_rate'
 
-]
+],
+
+enableKeyboardPlaybackControls:true
 
 });
 
@@ -662,18 +642,12 @@ shakaPlayer
 .registerRequestFilter(
 (type,request)=>{
 
-request.headers['Referer'] =
-config.referer;
-
-
 if(
 (type ===
-shaka.net.NetworkingEngine
-.RequestType.MANIFEST
+shaka.net.NetworkingEngine.RequestType.MANIFEST
 ||
 type ===
-shaka.net.NetworkingEngine
-.RequestType.SEGMENT)
+shaka.net.NetworkingEngine.RequestType.SEGMENT)
 &&
 config.token
 &&
@@ -681,8 +655,7 @@ config.token
 ){
 
 const sep =
-request.uris[0]
-.includes('?')
+request.uris[0].includes('?')
 ?
 '&'
 :
@@ -695,12 +668,11 @@ sep + config.token;
 
 }
 );
-  
 
 /* =========================
-LOAD STREAM
+LOAD
 ========================= */
-video.controls = true;
+
 shakaPlayer.load(config.mpd)
 
 .then(async()=>{
@@ -736,10 +708,6 @@ await video.play();
 console.log(e);
 
 }
-
-/* =========================
-AUTO UNMUTE
-========================= */
 
 setTimeout(()=>{
 
