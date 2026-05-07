@@ -642,57 +642,153 @@
         channelCountSpan.innerText = '0';
     }
 
-    async function loadChannels() {
-        showLoadingAnimation();
-        masterChannels = [];
-        uniqueCategories.clear();
+async function loadChannels() {
+    showLoadingAnimation();
 
-        try {
-            // small delay for smooth animation visibility
-            await new Promise(resolve => setTimeout(resolve, 300));
-            const response = await fetch('https://allinonereborn.online/tplay/channels.json?t=' + Date.now());
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const data = await response.json();
-            if (!Array.isArray(data) || data.length === 0) throw new Error('Empty or invalid channels array');
+    masterChannels = [];
+    uniqueCategories.clear();
 
-            masterChannels = data;
-            masterChannels.forEach(ch => {
-                if (!ch.category || typeof ch.category !== 'string') ch.category = "Entertainment";
-                uniqueCategories.add(ch.category);
-                if (!ch.language) ch.language = "Multi Language";
-                if (!ch.name) ch.name = "Channel";
-                if (!ch.id) ch.id = "0";
-                if (ch.live === undefined) ch.live = true;
-                if (!ch.logo) ch.logo = "";
-            });
+    try {
 
-            updateCategoryDropdown();
-            hideLoadingAndEnable();
-            renderChannels();
-        } catch (err) {
-            console.error(err);
-            let friendlyMsg = err.message.includes('fetch') ? 'Network error: cannot fetch channels.json' : err.message;
-            showErrorWithRetry(friendlyMsg);
+        // smooth loader delay
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        // ONLINE CHANNELS JSON
+        const response = await fetch(
+            'https://allinonereborn.online/tplay/channels.json?nocache=' + Date.now(),
+            {
+                method: 'GET',
+                cache: 'no-store'
+            }
+        );
+
+        console.log("Fetch Response:", response);
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
         }
+
+        // parse json safely
+        const data = await response.json();
+
+        console.log("Channels Data:", data);
+
+        // support both array and object format
+        masterChannels = Array.isArray(data)
+            ? data
+            : (data.channels || []);
+
+        // validate
+        if (!masterChannels.length) {
+            throw new Error('Channels list empty');
+        }
+
+        // normalize data
+        masterChannels.forEach(ch => {
+
+            if (!ch.category || typeof ch.category !== 'string') {
+                ch.category = "Entertainment";
+            }
+
+            uniqueCategories.add(ch.category);
+
+            if (!ch.language) {
+                ch.language = "Multi Language";
+            }
+
+            if (!ch.name) {
+                ch.name = "Channel";
+            }
+
+            if (!ch.id) {
+                ch.id = "0";
+            }
+
+            if (ch.live === undefined) {
+                ch.live = true;
+            }
+
+            if (!ch.logo) {
+                ch.logo = "";
+            }
+
+        });
+
+        console.log("Final Channels:", masterChannels.length);
+
+        updateCategoryDropdown();
+
+        hideLoadingAndEnable();
+
+        renderChannels();
+
+    } catch (err) {
+
+        console.error("LOAD CHANNEL ERROR:", err);
+
+        let friendlyMsg = '';
+
+        if (err.message.includes('Failed to fetch')) {
+
+            friendlyMsg = 'CORS / Network error while loading online channels';
+
+        } else if (err.message.includes('HTTP')) {
+
+            friendlyMsg = err.message;
+
+        } else {
+
+            friendlyMsg = err.message || 'Unknown error';
+
+        }
+
+        showErrorWithRetry(friendlyMsg);
+
+    }
+}
+
+
+// debounce for search
+let debounceTimer;
+
+function debouncedRender() {
+
+    clearTimeout(debounceTimer);
+
+    debounceTimer = setTimeout(() => {
+
+        if (masterChannels.length) {
+            renderChannels();
+        }
+
+    }, 220);
+
+}
+
+
+// search listener
+searchInput.addEventListener('input', () => {
+
+    if (masterChannels.length) {
+        debouncedRender();
     }
 
-    // debounce for search
-    let debounceTimer;
-    function debouncedRender() {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-            if (masterChannels.length) renderChannels();
-        }, 220);
+});
+
+
+// category listener
+categorySelect.addEventListener('change', () => {
+
+    if (masterChannels.length) {
+        renderChannels();
     }
 
-    searchInput.addEventListener('input', () => {
-        if (masterChannels.length) debouncedRender();
-    });
-    categorySelect.addEventListener('change', () => {
-        if (masterChannels.length) renderChannels();
-    });
+});
 
-    loadChannels();
+
+// INITIAL LOAD
+loadChannels();
+
 </script>
 </body>
 </html>
