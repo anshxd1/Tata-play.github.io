@@ -6,19 +6,21 @@
 
 <meta
 name="viewport"
-content="width=device-width,
-initial-scale=1.0,
-maximum-scale=1.0,
-viewport-fit=cover">
-
-<title id="pageTitle">Tata Play</title>
-
-<link
-rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css"
+content="width=device-width,initial-scale=1.0,viewport-fit=cover"
 />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js"></script>
+<title>Tata Play</title>
+
+<!-- SHAKA CORE -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.5/shaka-player.compiled.min.js"></script>
+
+<!-- SHAKA UI -->
+<link
+rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.5/controls.min.css"
+/>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.5/shaka-player.ui.min.js"></script>
 
 <style>
 
@@ -36,10 +38,9 @@ html,
 body{
   width:100%;
   height:100%;
-  overflow:hidden;
   background:#000;
+  overflow:hidden;
   font-family:sans-serif;
-  color:#fff;
 }
 
 /* =========================
@@ -50,7 +51,6 @@ APP
   width:100%;
   height:100vh;
   background:#000;
-  overflow:hidden;
   position:relative;
 }
 
@@ -59,6 +59,7 @@ HEADER
 ========================= */
 
 .header{
+
   position:fixed;
 
   top:0;
@@ -75,16 +76,17 @@ HEADER
 
   background:rgba(0,0,0,.72);
 
-  backdrop-filter:blur(16px);
-  -webkit-backdrop-filter:blur(16px);
+  backdrop-filter:blur(10px);
 
-  z-index:99999;
+  z-index:9999;
 
   border-bottom:
   1px solid rgba(255,255,255,.08);
+
 }
 
 .back-btn{
+
   width:42px;
   height:42px;
 
@@ -98,57 +100,53 @@ HEADER
 
   color:#fff;
 
+  font-size:20px;
+
   background:rgba(255,255,255,.08);
 
-  border:
-  1px solid rgba(255,255,255,.08);
-
-  font-size:20px;
 }
 
 .channel-info{
+
   display:flex;
   align-items:center;
   gap:12px;
 
-  min-width:0;
 }
 
 .channel-logo{
-  width:44px;
-  height:44px;
+
+  width:42px;
+  height:42px;
 
   border-radius:50%;
 
   object-fit:cover;
 
   background:#fff;
-}
 
-.channel-meta{
-  min-width:0;
 }
 
 .channel-meta h1{
-  font-size:16px;
-  font-weight:700;
 
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+  color:#fff;
+  font-size:16px;
+
 }
 
 .channel-meta p{
-  font-size:12px;
+
   color:#aaa;
-  margin-top:2px;
+  font-size:12px;
+
 }
 
 /* =========================
 PLAYER
 ========================= */
 
-.player-wrap{
+.player-container{
+
   position:absolute;
 
   top:64px;
@@ -159,64 +157,68 @@ PLAYER
 
   background:#000;
 
-  overflow:hidden;
 }
-
-/* =========================
-SHAKA
-========================= */
 
 .shaka-video-container{
+
   width:100% !important;
   height:100% !important;
-  background:#000 !important;
-}
 
-/* =========================
-VIDEO
-========================= */
+  background:#000 !important;
+
+}
 
 video{
+
   width:100% !important;
   height:100% !important;
 
-  object-fit:cover !important;
+  object-fit:contain !important;
 
   background:#000 !important;
+
 }
 
 /* =========================
-FORCE SHAKA CONTROLS
+FIX CONTROLS
 ========================= */
 
 .shaka-controls-container{
-  display:flex !important;
 
   opacity:1 !important;
   visibility:visible !important;
 
-  z-index:999999 !important;
 }
 
 .shaka-bottom-controls{
+
   display:flex !important;
+
 }
 
 .shaka-seek-bar-container{
+
   display:flex !important;
+
 }
 
 .shaka-fullscreen-button{
+
   display:flex !important;
+
 }
 
 .shaka-current-time,
 .shaka-time-duration{
+
   display:block !important;
+
 }
 
 .shaka-small-play-button{
+
   display:none !important;
+
 }
 
 /* =========================
@@ -224,6 +226,7 @@ STATUS
 ========================= */
 
 .status{
+
   position:absolute;
 
   top:50%;
@@ -231,36 +234,36 @@ STATUS
 
   transform:translate(-50%,-50%);
 
-  z-index:999999;
+  color:#fff;
 
-  background:rgba(0,0,0,.78);
+  z-index:99999;
 
-  padding:14px 22px;
+  background:rgba(0,0,0,.75);
 
-  border-radius:14px;
+  padding:14px 20px;
 
-  font-size:14px;
+  border-radius:12px;
 
-  border:
-  1px solid rgba(255,255,255,.08);
 }
 
 /* =========================
 FULLSCREEN
 ========================= */
 
-.shaka-video-container:fullscreen,
-video:fullscreen{
+video:fullscreen,
+.shaka-video-container:fullscreen{
+
   width:100vw !important;
   height:100vh !important;
-  background:#000 !important;
+
 }
 
-.shaka-video-container:-webkit-full-screen,
-video:-webkit-full-screen{
+video:-webkit-full-screen,
+.shaka-video-container:-webkit-full-screen{
+
   width:100vw !important;
   height:100vh !important;
-  background:#000 !important;
+
 }
 
 /* =========================
@@ -269,12 +272,10 @@ MOBILE
 
 @media(max-width:768px){
 
-  .player-wrap{
-    height:calc(100dvh - 64px);
-  }
+  .player-container{
 
-  video{
-    object-fit:contain !important;
+    height:calc(100dvh - 64px);
+
   }
 
 }
@@ -290,7 +291,10 @@ MOBILE
 
 <header class="header">
 
-<a href="index.html" class="back-btn">
+<a
+href="index.html"
+class="back-btn"
+>
 ←
 </a>
 
@@ -300,8 +304,8 @@ MOBILE
 id="channelLogo"
 class="channel-logo"
 src=""
-alt="logo"
-/>
+alt=""
+>
 
 <div class="channel-meta">
 
@@ -322,16 +326,16 @@ Tata Play
 <!-- PLAYER -->
 
 <div
-class="player-wrap"
+class="player-container"
 data-shaka-player-container
 >
 
 <video
 id="video"
 autoplay
-muted
 playsinline
 webkit-playsinline
+muted
 ></video>
 
 </div>
@@ -342,7 +346,7 @@ webkit-playsinline
 id="status"
 class="status"
 >
-Connecting...
+Loading stream...
 </div>
 
 </div>
@@ -350,20 +354,19 @@ Connecting...
 <script>
 
 /* =========================
-CHANNEL ID
+GET CHANNEL ID
 ========================= */
 
 const id =
-new URLSearchParams(location.search)
-.get("id");
-
-let player = null;
+new URLSearchParams(
+location.search
+).get("id");
 
 /* =========================
-FETCH CONFIG
+FETCH STREAM CONFIG
 ========================= */
 
-async function fetchStreamConfig(){
+async function getConfig(){
 
 try{
 
@@ -374,74 +377,63 @@ const proxy =
 `https://corsproxy.io/?${encodeURIComponent(target)}`;
 
 const res =
-await fetch(proxy,{
-cache:"no-cache"
-});
-
-if(!res.ok){
-
-throw new Error(
-"Fetch failed"
-);
-
-}
+await fetch(proxy);
 
 const html =
 await res.text();
 
 /* =========================
-PARSE CONFIG
+GET STREAM CONFIG
 ========================= */
 
-const configBlock =
+const configMatch =
 html.match(
-/const streamConfig\s*=\s*(\{[\s\S]*?\};)/
-)?.[1];
+/const streamConfig\s*=\s*(\{[\s\S]*?\});/
+);
 
-if(!configBlock){
+if(!configMatch){
 
 throw new Error(
-"streamConfig not found"
+"Config not found"
 );
 
 }
 
+const configText =
+configMatch[1];
+
 const name =
-configBlock.match(
+configText.match(
 /name:\s*["']([^"']+)["']/
 )?.[1] || "Channel";
 
 const mpd =
-configBlock.match(
+configText.match(
 /mpd:\s*["']([^"']+)["']/
 )?.[1] || "";
 
 const token =
-configBlock.match(
+configText.match(
 /token:\s*["']([^"']+)["']/
 )?.[1] || "";
 
-const drmMatch =
-configBlock.match(
-/drm:\s*\{([^}]+)\}/
+const drmKey =
+configText.match(
+/["']([a-zA-Z0-9]+)["']\s*:\s*["']([a-zA-Z0-9]+)["']/
 );
 
 let drm = {};
 
-if(drmMatch){
+if(drmKey){
 
-const key =
-drmMatch[1].match(
-/["']([^"']+)["']\s*:\s*["']([^"']+)["']/
-);
-
-if(key){
-
-drm[key[1]] = key[2];
+drm[drmKey[1]] =
+drmKey[2];
 
 }
 
-}
+/* =========================
+LOGO
+========================= */
 
 const logo =
 html.match(
@@ -452,13 +444,11 @@ html.match(
 UPDATE UI
 ========================= */
 
-document.getElementById(
-"pageTitle"
-).textContent = name;
+document.title = name;
 
 document.getElementById(
 "channelName"
-).textContent = name;
+).innerText = name;
 
 document.getElementById(
 "channelLogo"
@@ -469,16 +459,13 @@ document.getElementById(
 ).style.display = "none";
 
 /* =========================
-INIT PLAYER
+START PLAYER
 ========================= */
 
-initPlayer({
-
-name,
+startPlayer({
 mpd,
 token,
 drm
-
 });
 
 }catch(err){
@@ -495,14 +482,16 @@ document.getElementById(
 }
 
 /* =========================
-INIT PLAYER
+START PLAYER
 ========================= */
 
-function initPlayer(config){
+async function startPlayer(config){
 
 shaka.polyfill.installAll();
 
-if(!shaka.Player.isBrowserSupported()){
+if(
+!shaka.Player.isBrowserSupported()
+){
 
 alert(
 "Browser not supported"
@@ -519,15 +508,19 @@ document.getElementById(
 
 const container =
 document.querySelector(
-"[data-shaka-player-container]"
+".player-container"
 );
 
 /* =========================
-CREATE PLAYER
+PLAYER
 ========================= */
 
-player =
+const player =
 new shaka.Player(video);
+
+/* =========================
+UI
+========================= */
 
 const ui =
 new shaka.ui.Overlay(
@@ -536,14 +529,7 @@ container,
 video
 );
 
-const controls =
-ui.getControls();
-
-/* =========================
-UI CONFIG
-========================= */
-
-controls.configure({
+ui.configure({
 
 controlPanelElements:[
 
@@ -564,36 +550,20 @@ controlPanelElements:[
 });
 
 /* =========================
-DRM CONFIG
+DRM
 ========================= */
 
 player.configure({
 
 drm:{
 clearKeys:config.drm
-},
-
-streaming:{
-
-bufferingGoal:30,
-
-rebufferingGoal:15,
-
-retryParameters:{
-maxAttempts:5
-}
-
 }
 
 });
 
 /* =========================
-TOKEN FILTER
+TOKEN
 ========================= */
-
-player
-.getNetworkingEngine()
-.clearAllRequestFilters();
 
 player
 .getNetworkingEngine()
@@ -610,20 +580,25 @@ shaka.net.NetworkingEngine.RequestType.SEGMENT
 )
 &&
 config.token
-&&
+){
+
+if(
 !request.uris[0]
-.includes('__hdnea')
+.includes("__hdnea")
 ){
 
 const sep =
-request.uris[0].includes('?')
+request.uris[0]
+.includes("?")
 ?
-'&'
+"&"
 :
-'?';
+"?";
 
 request.uris[0] +=
 sep + config.token;
+
+}
 
 }
 
@@ -634,23 +609,15 @@ sep + config.token;
 LOAD STREAM
 ========================= */
 
-player.load(config.mpd)
-
-.then(async()=>{
-
 try{
+
+await player.load(
+config.mpd
+);
 
 await video.play();
 
-}catch(e){
-
-console.log(e);
-
-}
-
-})
-
-.catch(err=>{
+}catch(err){
 
 console.error(err);
 
@@ -663,7 +630,7 @@ document.getElementById(
 ).innerHTML =
 "❌ Stream failed";
 
-});
+}
 
 }
 
@@ -673,7 +640,7 @@ START
 
 if(id){
 
-fetchStreamConfig();
+getConfig();
 
 }else{
 
