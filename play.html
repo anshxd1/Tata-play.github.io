@@ -1,19 +1,21 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
+
 <meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"
-/>
+name="viewport"
+content="width=device-width,
+initial-scale=1.0,
+maximum-scale=1.0,
+viewport-fit=cover">
 
 <title id="pageTitle">Tata Play</title>
 
 <link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css"
+rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css"
 />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js"></script>
@@ -37,9 +39,6 @@ body{
   overflow:hidden;
   background:#000;
   font-family:sans-serif;
-}
-
-body{
   color:#fff;
 }
 
@@ -145,7 +144,7 @@ HEADER
 }
 
 /* =========================
-PLAYER WRAP
+PLAYER
 ========================= */
 
 .player-wrap{
@@ -163,7 +162,7 @@ PLAYER WRAP
 }
 
 /* =========================
-SHAKA
+SHAKA CONTAINER
 ========================= */
 
 .shaka-video-container{
@@ -171,6 +170,10 @@ SHAKA
   height:100% !important;
   background:#000 !important;
 }
+
+/* =========================
+VIDEO
+========================= */
 
 video{
   width:100% !important;
@@ -182,24 +185,22 @@ video{
 }
 
 /* =========================
-CONTROLS FIX
+SHAKA CONTROLS
 ========================= */
 
 .shaka-controls-container{
-  z-index:999999 !important;
-
   opacity:1 !important;
   visibility:visible !important;
+
+  z-index:999999 !important;
 }
 
 .shaka-bottom-controls{
   display:flex !important;
-  opacity:1 !important;
 }
 
 .shaka-seek-bar-container{
   display:flex !important;
-  opacity:1 !important;
 }
 
 .shaka-fullscreen-button{
@@ -246,7 +247,7 @@ STATUS
 }
 
 /* =========================
-FULLSCREEN FIX
+FULLSCREEN
 ========================= */
 
 .shaka-video-container:fullscreen,
@@ -286,64 +287,71 @@ MOBILE
 
 <div class="app">
 
-  <!-- HEADER -->
+<!-- HEADER -->
 
-  <header class="header">
+<header class="header">
 
-    <a href="index.html" class="back-btn">
-      ←
-    </a>
+<a href="index.html" class="back-btn">
+←
+</a>
 
-    <div class="channel-info">
+<div class="channel-info">
 
-      <img
-        id="channelLogo"
-        class="channel-logo"
-        src=""
-        alt="logo"
-      />
+<img
+id="channelLogo"
+class="channel-logo"
+src=""
+alt="logo"
+/>
 
-      <div class="channel-meta">
-        <h1 id="channelName">Loading...</h1>
-        <p>Tata Play</p>
-      </div>
+<div class="channel-meta">
 
-    </div>
+<h1 id="channelName">
+Loading...
+</h1>
 
-  </header>
+<p>
+Tata Play
+</p>
 
-  <!-- PLAYER -->
+</div>
 
-  <div
-    class="player-wrap"
-    data-shaka-player-container
-  >
+</div>
 
-    <video
-      id="video"
-      autoplay
-      muted
-      playsinline
-      webkit-playsinline
-    ></video>
+</header>
 
-  </div>
+<!-- PLAYER -->
 
-  <!-- STATUS -->
+<div
+class="player-wrap"
+data-shaka-player-container
+>
 
-  <div
-    id="status"
-    class="status"
-  >
-    Connecting...
-  </div>
+<video
+id="video"
+autoplay
+muted
+playsinline
+webkit-playsinline
+></video>
+
+</div>
+
+<!-- STATUS -->
+
+<div
+id="status"
+class="status"
+>
+Connecting...
+</div>
 
 </div>
 
 <script>
 
 /* =========================
-GET CHANNEL ID
+CHANNEL ID
 ========================= */
 
 const id =
@@ -358,112 +366,132 @@ FETCH CONFIG
 
 async function fetchStreamConfig(){
 
-  try{
+try{
 
-    const target =
-    `https://allinonereborn.online/tplay/play.php?id=${id}`;
+const target =
+`https://allinonereborn.online/tplay/play.php?id=${id}`;
 
-    const proxy =
-    `https://corsproxy.io/?${encodeURIComponent(target)}`;
+const proxy =
+`https://corsproxy.io/?${encodeURIComponent(target)}`;
 
-    const res =
-    await fetch(proxy,{
-      cache:"no-cache"
-    });
+const res =
+await fetch(proxy,{
+cache:"no-cache"
+});
 
-    if(!res.ok){
-      throw new Error(
-        "Fetch failed"
-      );
-    }
+if(!res.ok){
 
-    const html =
-    await res.text();
+throw new Error(
+"Fetch failed"
+);
 
-    const configBlock =
-    html.match(
-      /const streamConfig\s*=\s*(\{[\s\S]*?\};)/
-    )?.[1];
+}
 
-    if(!configBlock){
-      throw new Error(
-        "streamConfig not found"
-      );
-    }
+const html =
+await res.text();
 
-    const name =
-    configBlock.match(
-      /name:\s*["']([^"']+)["']/
-    )?.[1] || "Channel";
+/* =========================
+PARSE CONFIG
+========================= */
 
-    const mpd =
-    configBlock.match(
-      /mpd:\s*["']([^"']+)["']/
-    )?.[1] || "";
+const configBlock =
+html.match(
+/const streamConfig\s*=\s*(\{[\s\S]*?\};)/
+)?.[1];
 
-    const token =
-    configBlock.match(
-      /token:\s*["']([^"']+)["']/
-    )?.[1] || "";
+if(!configBlock){
 
-    const drmMatch =
-    configBlock.match(
-      /drm:\s*\{([^}]+)\}/
-    );
+throw new Error(
+"streamConfig not found"
+);
 
-    let drm = {};
+}
 
-    if(drmMatch){
+const name =
+configBlock.match(
+/name:\s*["']([^"']+)["']/
+)?.[1] || "Channel";
 
-      const key =
-      drmMatch[1].match(
-        /["']([^"']+)["']\s*:\s*["']([^"']+)["']/
-      );
+const mpd =
+configBlock.match(
+/mpd:\s*["']([^"']+)["']/
+)?.[1] || "";
 
-      if(key){
-        drm[key[1]] = key[2];
-      }
+const token =
+configBlock.match(
+/token:\s*["']([^"']+)["']/
+)?.[1] || "";
 
-    }
+const drmMatch =
+configBlock.match(
+/drm:\s*\{([^}]+)\}/
+);
 
-    const logo =
-    html.match(
-      /const CHANNEL_LOGO = ["']([^"']+)["']/
-    )?.[1] || "";
+let drm = {};
 
-    document.getElementById(
-      "pageTitle"
-    ).textContent = name;
+if(drmMatch){
 
-    document.getElementById(
-      "channelName"
-    ).textContent = name;
+const key =
+drmMatch[1].match(
+/["']([^"']+)["']\s*:\s*["']([^"']+)["']/
+);
 
-    document.getElementById(
-      "channelLogo"
-    ).src = logo;
+if(key){
 
-    document.getElementById(
-      "status"
-    ).style.display = "none";
+drm[key[1]] = key[2];
 
-    initPlayer({
-      name,
-      mpd,
-      token,
-      drm
-    });
+}
 
-  }catch(err){
+}
 
-    console.error(err);
+const logo =
+html.match(
+/const CHANNEL_LOGO = ["']([^"']+)["']/
+)?.[1] || "";
 
-    document.getElementById(
-      "status"
-    ).innerHTML =
-    "❌ Failed to load stream";
+/* =========================
+UPDATE UI
+========================= */
 
-  }
+document.getElementById(
+"pageTitle"
+).textContent = name;
+
+document.getElementById(
+"channelName"
+).textContent = name;
+
+document.getElementById(
+"channelLogo"
+).src = logo;
+
+document.getElementById(
+"status"
+).style.display = "none";
+
+/* =========================
+INIT PLAYER
+========================= */
+
+initPlayer({
+
+name,
+mpd,
+token,
+drm
+
+});
+
+}catch(err){
+
+console.error(err);
+
+document.getElementById(
+"status"
+).innerHTML =
+"❌ Failed to load stream";
+
+}
 
 }
 
@@ -473,179 +501,186 @@ INIT PLAYER
 
 function initPlayer(config){
 
-  shaka.polyfill.installAll();
+shaka.polyfill.installAll();
 
-  if(!shaka.Player.isBrowserSupported()){
+if(!shaka.Player.isBrowserSupported()){
 
-    alert(
-      "Browser not supported"
-    );
+alert(
+"Browser not supported"
+);
 
-    return;
+return;
 
-  }
+}
 
-  const video =
-  document.getElementById("video");
+const video =
+document.getElementById(
+"video"
+);
 
-  const container =
-  document.querySelector(
-    "[data-shaka-player-container]"
-  );
+const container =
+document.querySelector(
+"[data-shaka-player-container]"
+);
 
-  player =
-  new shaka.Player(video);
+/* =========================
+CREATE PLAYER
+========================= */
 
-  const ui =
-  new shaka.ui.Overlay(
-    player,
-    container,
-    video
-  );
+player =
+new shaka.Player(video);
 
-  /* =========================
-  UI CONFIG
-  ========================= */
+const ui =
+new shaka.ui.Overlay(
+player,
+container,
+video
+);
 
-  ui.configure({
+const controls =
+ui.getControls();
 
-    addSeekBar:true,
+/* =========================
+UI CONFIG
+========================= */
 
-    controlPanelElements:[
+controls.configure({
 
-      'play_pause',
+addSeekBar:true,
 
-      'time_and_duration',
+controlPanelElements:[
 
-      'spacer',
+'play_pause',
 
-      'mute',
+'time_and_duration',
 
-      'volume',
+'spacer',
 
-      'fullscreen',
+'mute',
 
-      'overflow_menu'
+'volume',
 
-    ],
+'fullscreen',
 
-    overflowMenuButtons:[
+'overflow_menu'
 
-      'quality',
+],
 
-      'language',
+overflowMenuButtons:[
 
-      'playback_rate',
+'quality',
 
-      'picture_in_picture'
+'language',
 
-    ],
+'playback_rate',
 
-    enableKeyboardPlaybackControls:true
+'picture_in_picture'
 
-  });
+]
 
-  ui.getControls().setEnabled(true);
+});
 
-  /* =========================
-  DRM
-  ========================= */
+/* =========================
+DRM CONFIG
+========================= */
 
-  player.configure({
+player.configure({
 
-    drm:{
-      clearKeys:config.drm
-    },
+drm:{
+clearKeys:config.drm
+},
 
-    streaming:{
+streaming:{
 
-      bufferingGoal:30,
+bufferingGoal:30,
 
-      rebufferingGoal:15,
+rebufferingGoal:15,
 
-      retryParameters:{
-        maxAttempts:5
-      }
+retryParameters:{
+maxAttempts:5
+}
 
-    }
+}
 
-  });
+});
 
-  /* =========================
-  TOKEN FILTER
-  ========================= */
+/* =========================
+TOKEN FILTER
+========================= */
 
-  player
-  .getNetworkingEngine()
-  .clearAllRequestFilters();
+player
+.getNetworkingEngine()
+.clearAllRequestFilters();
 
-  player
-  .getNetworkingEngine()
-  .registerRequestFilter(
-    (type,request)=>{
+player
+.getNetworkingEngine()
+.registerRequestFilter(
+(type,request)=>{
 
-      if(
-        (
-          type ===
-          shaka.net.NetworkingEngine.RequestType.MANIFEST
-          ||
-          type ===
-          shaka.net.NetworkingEngine.RequestType.SEGMENT
-        )
-        &&
-        config.token
-        &&
-        !request.uris[0]
-        .includes('__hdnea')
-      ){
+if(
+(
+type ===
+shaka.net.NetworkingEngine.RequestType.MANIFEST
+||
+type ===
+shaka.net.NetworkingEngine.RequestType.SEGMENT
+)
+&&
+config.token
+&&
+!request.uris[0]
+.includes('__hdnea')
+){
 
-        const sep =
-        request.uris[0].includes('?')
-        ? '&'
-        : '?';
+const sep =
+request.uris[0].includes('?')
+?
+'&'
+:
+'?';
 
-        request.uris[0] +=
-        sep + config.token;
+request.uris[0] +=
+sep + config.token;
 
-      }
+}
 
-    }
-  );
+}
+);
 
-  /* =========================
-  LOAD STREAM
-  ========================= */
+/* =========================
+LOAD STREAM
+========================= */
 
-  player.load(config.mpd)
+player.load(config.mpd)
 
-  .then(async()=>{
+.then(async()=>{
 
-    try{
+try{
 
-      await video.play();
+await video.play();
 
-    }catch(e){
+}catch(e){
 
-      console.log(e);
+console.log(e);
 
-    }
+}
 
-  })
+})
 
-  .catch(err=>{
+.catch(err=>{
 
-    console.error(err);
+console.error(err);
 
-    document.getElementById(
-      "status"
-    ).style.display = "block";
+document.getElementById(
+"status"
+).style.display = "block";
 
-    document.getElementById(
-      "status"
-    ).innerHTML =
-    "❌ Stream failed";
+document.getElementById(
+"status"
+).innerHTML =
+"❌ Stream failed";
 
-  });
+});
 
 }
 
@@ -655,14 +690,14 @@ START
 
 if(id){
 
-  fetchStreamConfig();
+fetchStreamConfig();
 
 }else{
 
-  document.getElementById(
-    "status"
-  ).innerHTML =
-  "No Channel ID";
+document.getElementById(
+"status"
+).innerHTML =
+"No Channel ID";
 
 }
 
