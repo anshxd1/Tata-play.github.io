@@ -12,11 +12,11 @@
     .player-area { position:fixed; top:0; left:0; width:100vw; height:100dvh; }
     .header {
       position: absolute; top: 15px; left: 15px; z-index: 10000;
-      background: rgba(0,0,0,0.8); padding: 12px 16px; border-radius: 12px;
+      background: rgba(0,0,0,0.85); padding: 12px 16px; border-radius: 12px;
       display: flex; align-items: center; gap: 12px; backdrop-filter: blur(12px);
     }
     .back-btn { font-size: 30px; color: white; text-decoration: none; }
-    .loading { text-align:center; margin-top: 40vh; font-size: 18px; }
+    .loading { text-align:center; margin-top: 40vh; font-size: 18px; color:#aaa; }
   </style>
 </head>
 <body>
@@ -26,7 +26,7 @@
     <a href="index.html" class="back-btn">←</a>
     <div>
       <strong id="chName">Loading Channel...</strong><br>
-      <small id="chInfo">Please wait</small>
+      <small id="chInfo">Tata Play Live</small>
     </div>
   </div>
 
@@ -43,47 +43,45 @@ const params = new URLSearchParams(location.search);
 const id = params.get('id');
 
 if (!id) {
-  document.body.innerHTML = `<h2 style="color:red;text-align:center;margin-top:100px">Channel ID missing</h2>`;
+  document.body.innerHTML = `<h2 style="color:red;text-align:center;margin-top:100px">❌ Channel ID missing</h2>`;
 }
 
 async function fetchStreamConfig() {
   try {
-    document.getElementById('chName').textContent = "Fetching stream...";
+    document.getElementById('chName').textContent = "Fetching stream config...";
     
     const targetUrl = `https://allinonereborn.online/tplay/play.php?id=${id}`;
     const response = await fetch(CORS_PROXY + encodeURIComponent(targetUrl));
     const html = await response.text();
 
-    // Better regex to extract streamConfig
-    let match = html.match(/const streamConfig\s*=\s*(\{[\s\S]*?\});/);
-    
-    if (!match) {
-      match = html.match(/streamConfig\s*=\s*(\{[\s\S]*?\});/);
-    }
-
-    if (!match) throw new Error("Stream config not found");
+    // Extract streamConfig block
+    const match = html.match(/const streamConfig\s*=\s*(\{[\s\S]*?\});/);
+    if (!match) throw new Error("Config block not found");
 
     let configStr = match[1];
 
-    // Advanced cleaning for JS object → JSON
+    // Smart cleaning
     configStr = configStr
-      .replace(/(\w+):/g, '"$1":')           // unquoted keys
-      .replace(/'/g, '"')                    // single to double quotes
-      .replace(/,\s*}/g, '}')                // trailing commas
-      .replace(/,\s*([\]}])/g, '$1');        // more trailing comma fixes
+      .replace(/(\w+):(?=\s*["'{\[])/g, '"$1":')   // keys only before value
+      .replace(/'/g, '"')
+      .replace(/,\s*}/g, '}')
+      .replace(/,\s*([\]}])/g, '$1');
+
+    // Fix https: issue
+    configStr = configStr.replace(/"https":/g, '"https": "https');
 
     const streamConfig = JSON.parse(configStr);
 
     // Update UI
     document.getElementById('chName').textContent = streamConfig.name || `Channel ${id}`;
-    document.getElementById('title').textContent = (streamConfig.name || 'Live TV') + " — Tata Play";
-    document.getElementById('chInfo').textContent = "HD • Live";
+    document.getElementById('title').textContent = (streamConfig.name || 'Live') + " — Tata Play";
+    document.getElementById('chInfo').textContent = "HD Live";
 
     initShakaPlayer(streamConfig);
 
   } catch (err) {
     console.error(err);
-    document.getElementById('chName').innerHTML = `❌ Failed to load<br><small>${err.message}</small>`;
+    document.getElementById('chName').innerHTML = `❌ Load Failed<br><small>Check Console (F12)</small>`;
   }
 }
 
@@ -97,7 +95,7 @@ function initShakaPlayer(config) {
 
   player.configure({
     drm: { clearKeys: config.drm || {} },
-    streaming: { bufferingGoal: 30, rebufferingGoal: 15 }
+    streaming: { bufferingGoal: 30 }
   });
 
   player.getNetworkingEngine().registerRequestFilter((type, request) => {
@@ -112,14 +110,14 @@ function initShakaPlayer(config) {
   });
 
   player.load(config.mpd)
-    .then(() => console.log("✅ Stream Loaded"))
+    .then(() => console.log("✅ Stream Started Successfully"))
     .catch(e => {
-      console.error("Load Error:", e);
-      alert("Cannot play stream. Token may have expired.");
+      console.error(e);
+      alert("Stream failed to load. Token might be expired.");
     });
 }
 
-// Start Loading
+// Start
 fetchStreamConfig();
 </script>
 </body>
